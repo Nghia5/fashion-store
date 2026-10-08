@@ -1,0 +1,36 @@
+<aside class="admin-sidebar" id="adminSidebar">
+  <div class="sidebar-brand">
+    <span class="logo-icon">✦</span>
+    <span>FASHION<span class="logo-accent">STORE</span></span>
+    <span class="sidebar-badge">ADMIN</span>
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="sidebar-section-label">TỔNG QUAN</div>
+    <a href="/admin/dashboard" class="sidebar-link <%= currentPath&&currentPath.includes('dashboard')?'active':'' %>">
+      <i class="fas fa-chart-pie"></i> <span>Dashboard</span>
+    </a>
+
+    <div class="sidebar-section-label">QUẢN LÝ</div>
+    <a href="/admin/products" class="sidebar-link <%= currentPath&&currentPath.includes('products')?'active':'' %>">
+      <i class="fas fa-tshirt"></i> <span>Sản phẩm</span>
+    </a>
+    <a href="/admin/orders" class="sidebar-link <%= currentPath&&currentPath.includes('orders')?'active':'' %>">
+      <i class="fas fa-shopping-bag"></i> <span>Đơn hàng</span>
+    </a>
+    <a href="/admin/users" class="sidebar-link <%= currentPath&&currentPath.includes('users')?'active':'' %>">
+      <i class="fas fa-users"></i> <span>Khách hàng</span>
+    </a>
+    <a href="/admin/categories" class="sidebar-link <%= currentPath&&currentPath.includes('categories')?'active':'' %>">
+      <i class="fas fa-tags"></i> <span>Danh mục</span>
+    </a>
+
+    <div class="sidebar-section-label">HỆ THỐNG</div>
+    <a href="/" class="sidebar-link" target="_blank">
+      <i class="fas fa-external-link-alt"></i> <span>Xem website</span>
+    </a>
+    <a href="/auth/logout" class="sidebar-link logout-link">
+      <i class="fas fa-sign-out-alt"></i> <span>Đăng xuất</span>
+    </a>
+  </nav>
+</aside>

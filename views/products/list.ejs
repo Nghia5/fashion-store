@@ -1,0 +1,198 @@
+<%
+  const fmt = (p) => p ? Number(p).toLocaleString('vi-VN') : '0';
+  const getImg = (p) => (p.images && p.images[0]) ? p.images[0] : 'https://picsum.photos/400/400?random=' + (p._id || Math.random());
+  const getDiscount = (p) => p.salePrice ? Math.round((1 - p.salePrice / p.price) * 100) : 0;
+%>
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %> | Fashion Store</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/shopee.css?v=5">
+  <link rel="stylesheet" href="/css/listing.css?v=5">
+</head>
+<body>
+<% if (typeof success !== 'undefined' && success && success.length) { %><div class="flash flash-success"><i class="fas fa-check-circle"></i> <%= success[0] %></div><% } %>
+<% if (typeof error !== 'undefined' && error && error.length) { %><div class="flash flash-error"><i class="fas fa-exclamation-circle"></i> <%= error[0] %></div><% } %>
+<%- include('../partials/navbar') %>
+
+<!-- Breadcrumb -->
+<div class="sp-breadcrumb">
+  <div class="container">
+    <a href="/">Trang chủ</a> <i class="fas fa-chevron-right"></i>
+    <span>Sản phẩm</span>
+    <% if (filters.q) { %> <i class="fas fa-chevron-right"></i> <span>Tìm kiếm: "<%= filters.q %>"</span><% } %>
+    <% if (filters.gender) { %> <i class="fas fa-chevron-right"></i> <span><%= filters.gender==='male'?'Nam':filters.gender==='female'?'Nữ':'Unisex' %></span><% } %>
+  </div>
+</div>
+
+<div class="container spl-layout">
+  <!-- LEFT SIDEBAR -->
+  <aside class="spl-sidebar">
+    <form action="/products" method="GET" id="filterForm">
+      <% if (filters.q) { %><input type="hidden" name="q" value="<%= filters.q %>"><% } %>
+
+      <div class="spl-filter-title"><i class="fas fa-filter"></i> BỘ LỌC TÌM KIẾM</div>
+
+      <!-- Gender -->
+      <div class="spl-filter-group">
+        <h4>Giới tính</h4>
+        <label class="spl-checkbox"><input type="radio" name="gender" value="" <%= !filters.gender?'checked':'' %> onchange="this.form.submit()"><span>Tất cả</span></label>
+        <label class="spl-checkbox"><input type="radio" name="gender" value="male" <%= filters.gender==='male'?'checked':'' %> onchange="this.form.submit()"><span>Nam</span></label>
+        <label class="spl-checkbox"><input type="radio" name="gender" value="female" <%= filters.gender==='female'?'checked':'' %> onchange="this.form.submit()"><span>Nữ</span></label>
+        <label class="spl-checkbox"><input type="radio" name="gender" value="unisex" <%= filters.gender==='unisex'?'checked':'' %> onchange="this.form.submit()"><span>Unisex</span></label>
+      </div>
+
+      <!-- Categories -->
+      <div class="spl-filter-group">
+        <h4>Danh mục</h4>
+        <% if (typeof categories !== 'undefined') { %>
+          <% categories.forEach(cat => { %>
+            <label class="spl-checkbox">
+              <input type="radio" name="category" value="<%= cat.Slug %>" <%= filters.category===cat.Slug?'checked':'' %> onchange="this.form.submit()">
+              <span><%= cat.Name %></span>
+            </label>
+          <% }); %>
+        <% } %>
+      </div>
+
+      <!-- Price -->
+      <div class="spl-filter-group">
+        <h4>Khoảng giá</h4>
+        <div class="spl-price-row">
+          <input type="number" name="minPrice" placeholder="Đ Từ" value="<%= filters.minPrice||'' %>" class="spl-price-input">
+          <span class="spl-price-sep">—</span>
+          <input type="number" name="maxPrice" placeholder="Đ Đến" value="<%= filters.maxPrice||'' %>" class="spl-price-input">
+        </div>
+        <button type="submit" class="spl-apply-btn">ÁP DỤNG</button>
+      </div>
+
+      <!-- Quick Price -->
+      <div class="spl-price-tags">
+        <button type="button" class="spl-tag" onclick="setPrice(0,200000)">Dưới 200K</button>
+        <button type="button" class="spl-tag" onclick="setPrice(200000,500000)">200K-500K</button>
+        <button type="button" class="spl-tag" onclick="setPrice(500000,1000000)">500K-1M</button>
+        <button type="button" class="spl-tag" onclick="setPrice(1000000,'')">Trên 1M</button>
+      </div>
+
+      <a href="/products" class="spl-clear-btn">Xóa tất cả</a>
+    </form>
+  </aside>
+
+  <!-- RIGHT: Products -->
+  <main class="spl-main">
+    <!-- Search Result Header -->
+    <% if (filters.q) { %>
+      <div class="spl-search-result">
+        <i class="fas fa-lightbulb"></i> Kết quả tìm kiếm cho '<strong><%= filters.q %></strong>'
+      </div>
+    <% } %>
+
+    <!-- Sort Tabs -->
+    <div class="spl-sort-bar">
+      <span class="spl-sort-label">Sắp xếp theo</span>
+      <a href="?<%= new URLSearchParams({...filters, sort:'-createdAt', page:1}).toString() %>" class="spl-sort-tab <%= !filters.sort||filters.sort==='-createdAt'?'active':'' %>">Mới Nhất</a>
+      <a href="?<%= new URLSearchParams({...filters, sort:'popular', page:1}).toString() %>" class="spl-sort-tab <%= filters.sort==='popular'?'active':'' %>">Bán Chạy</a>
+      <a href="?<%= new URLSearchParams({...filters, sort:'rating', page:1}).toString() %>" class="spl-sort-tab <%= filters.sort==='rating'?'active':'' %>">Đánh Giá</a>
+      <select class="spl-sort-select" onchange="applySort(this.value)">
+        <option value="">Giá</option>
+        <option value="price-asc" <%= filters.sort==='price-asc'?'selected':'' %>>Giá: Thấp → Cao</option>
+        <option value="price-desc" <%= filters.sort==='price-desc'?'selected':'' %>>Giá: Cao → Thấp</option>
+      </select>
+      <div class="spl-sort-right">
+        <span class="spl-page-info"><%= typeof currentPage !== 'undefined' ? currentPage : 1 %>/<%= typeof totalPages !== 'undefined' ? totalPages : 1 %></span>
+        <% if (typeof totalPages !== 'undefined' && totalPages > 1) { %>
+          <a href="?<%= new URLSearchParams({...filters, page: Math.max(1,(currentPage||1)-1)}).toString() %>" class="spl-page-arrow"><i class="fas fa-chevron-left"></i></a>
+          <a href="?<%= new URLSearchParams({...filters, page: Math.min(totalPages,(currentPage||1)+1)}).toString() %>" class="spl-page-arrow"><i class="fas fa-chevron-right"></i></a>
+        <% } %>
+      </div>
+    </div>
+
+    <!-- Products Grid -->
+    <% if (products.length === 0) { %>
+      <div class="spl-empty">
+        <i class="fas fa-box-open"></i>
+        <h3>Không tìm thấy sản phẩm</h3>
+        <p>Thử điều chỉnh bộ lọc hoặc từ khóa tìm kiếm</p>
+        <a href="/products" class="btn btn-primary">Xem tất cả</a>
+      </div>
+    <% } else { %>
+      <div class="spl-grid">
+        <% products.forEach(product => { %>
+          <a href="/products/<%= product.slug %>" class="spl-card">
+            <div class="spl-card-img">
+              <img src="<%= getImg(product) %>" alt="<%= product.name %>" loading="lazy">
+              <% if (getDiscount(product) > 0) { %>
+                <span class="spl-badge-sale"><%= getDiscount(product) %>%<br><small>GIẢM</small></span>
+              <% } %>
+              <% if (product.isNewArrival) { %>
+                <span class="spl-badge-new">Mới</span>
+              <% } %>
+              <div class="spl-card-hover">
+                <span><i class="fas fa-eye"></i> Xem nhanh</span>
+              </div>
+            </div>
+            <div class="spl-card-body">
+              <h3 class="spl-card-name"><%= product.name %></h3>
+              <div class="spl-card-price">
+                <% if (product.salePrice) { %>
+                  <span class="spl-price-now">đ<%= fmt(product.salePrice) %></span>
+                  <span class="spl-price-old">đ<%= fmt(product.price) %></span>
+                <% } else { %>
+                  <span class="spl-price-now">đ<%= fmt(product.price) %></span>
+                <% } %>
+              </div>
+              <div class="spl-card-meta">
+                <div class="spl-card-stars">
+                  <% for(let i=1; i<=5; i++) { %>
+                    <i class="fas fa-star <%= i<=Math.round(product.rating)?'filled':'' %>"></i>
+                  <% } %>
+                </div>
+                <span class="spl-card-sold">Đã bán <%= product.Sold || product.sold || 0 %></span>
+              </div>
+            </div>
+          </a>
+        <% }); %>
+      </div>
+
+      <!-- Pagination -->
+      <% if (typeof totalPages !== 'undefined' && totalPages > 1) { %>
+        <div class="spl-pagination">
+          <% if ((currentPage||1) > 1) { %>
+            <a href="?<%= new URLSearchParams({...filters, page:(currentPage||1)-1}).toString() %>" class="spl-page-btn"><i class="fas fa-chevron-left"></i></a>
+          <% } %>
+          <% for(let i=1; i<=totalPages; i++) { %>
+            <a href="?<%= new URLSearchParams({...filters, page:i}).toString() %>" class="spl-page-btn <%= i===(currentPage||1)?'active':'' %>"><%= i %></a>
+          <% } %>
+          <% if ((currentPage||1) < totalPages) { %>
+            <a href="?<%= new URLSearchParams({...filters, page:(currentPage||1)+1}).toString() %>" class="spl-page-btn"><i class="fas fa-chevron-right"></i></a>
+          <% } %>
+        </div>
+      <% } %>
+    <% } %>
+  </main>
+</div>
+
+<%- include('../partials/footer') %>
+<button class="scroll-top" id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="fas fa-arrow-up"></i></button>
+
+<script>
+function applySort(val) {
+  const url = new URL(window.location);
+  url.searchParams.set('sort', val);
+  url.searchParams.set('page', '1');
+  window.location = url.toString();
+}
+function setPrice(min, max) {
+  document.querySelector('[name=minPrice]').value = min;
+  document.querySelector('[name=maxPrice]').value = max || '';
+  document.getElementById('filterForm').submit();
+}
+</script>
+<script src="/js/main.js"></script>
+</body>
+</html>

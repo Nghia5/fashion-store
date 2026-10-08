@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quản lý người dùng | Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="admin-body">
+<%- include('../partials/admin-sidebar') %>
+
+<div class="admin-main">
+  <div class="admin-topbar">
+    <button class="sidebar-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+    <h2>Quản lý Người dùng</h2>
+  </div>
+
+  <div class="admin-content">
+    <div class="admin-filters" style="margin-bottom: 2rem;">
+      <form action="/admin/users" method="GET" class="filters-form">
+        <input type="text" name="search" class="filter-input"
+               placeholder="Tìm theo tên hoặc email..." value="<%= filters.search||'' %>">
+        <button type="submit" class="btn btn-outline">Tìm kiếm</button>
+      </form>
+    </div>
+
+    <div class="admin-card">
+      <div class="admin-table-wrap">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Avatar</th>
+              <th>Họ tên</th>
+              <th>Email</th>
+              <th>Điện thoại</th>
+              <th>Vai trò</th>
+              <th>Trạng thái</th>
+              <th>Ngày tham gia</th>
+              <th>Hành động</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% users.forEach(u => { %>
+            <tr id="user-row-<%= u.Id %>">
+              <td>
+                <img src="<%= u.Avatar || 'https://ui-avatars.com/api/?name=' + u.Name + '&background=random' %>" alt="<%= u.Name %>" class="admin-user-avatar">
+              </td>
+              <td><strong><%= u.Name %></strong></td>
+              <td><%= u.Email %></td>
+              <td><%= u.Phone || '—' %></td>
+              <td>
+                <span class="badge <%= u.Role==='admin'?'badge-sale':'badge-new' %>">
+                  <%= u.Role === 'admin' ? 'Admin' : 'User' %>
+                </span>
+              </td>
+              <td>
+                <span class="status-badge <%= u.IsActive?'status-delivered':'status-cancelled' %>" id="status-<%= u.Id %>">
+                  <%= u.IsActive ? 'Hoạt động' : 'Bị khóa' %>
+                </span>
+              </td>
+              <td><%= new Date(u.CreatedAt).toLocaleDateString('vi-VN') %></td>
+              <td>
+                <% if (u.Role !== 'admin') { %>
+                  <button class="btn btn-outline btn-xs" onclick="toggleUser('<%= u.Id %>')" id="toggle-btn-<%= u.Id %>">
+                    <i class="fas fa-<%= u.IsActive ? 'ban' : 'check' %>"></i>
+                    <%= u.IsActive ? 'Khóa' : 'Mở khóa' %>
+                  </button>
+                <% } %>
+              </td>
+            </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      </div>
+
+      <% if (totalPages > 1) { %>
+      <div class="pagination" style="padding:1rem;">
+        <% for(let i=1; i<=totalPages; i++) { %>
+        <a href="?search=<%= filters.search||'' %>&page=<%= i %>" class="page-btn <%= i===currentPage?'active':'' %>"><%= i %></a>
+        <% } %>
+      </div>
+      <% } %>
+    </div>
+  </div>
+</div>
+
+<script>
+function toggleUser(userId) {
+  if (!confirm('Thay đổi trạng thái người dùng này?')) return;
+  fetch('/admin/users/' + userId + '/toggle', { method: 'PUT' })
+    .then(r => r.json())
+    .then(data => {
+      if (data.success) {
+        const badge = document.getElementById('status-' + userId);
+        const btn = document.getElementById('toggle-btn-' + userId);
+        if (data.IsActive) {
+          badge.textContent = 'Hoạt động'; badge.className = 'status-badge status-delivered';
+          btn.innerHTML = '<i class="fas fa-ban"></i> Khóa';
+        } else {
+          badge.textContent = 'Bị khóa'; badge.className = 'status-badge status-cancelled';
+          btn.innerHTML = '<i class="fas fa-check"></i> Mở khóa';
+        }
+        showAdminToast('Đã cập nhật', 'success');
+      }
+    });
+}
+function showAdminToast(msg, type) {
+  const d = document.createElement('div');
+  d.className = 'flash flash-' + type;
+  d.textContent = msg;
+  document.body.appendChild(d);
+  setTimeout(() => d.remove(), 3000);
+}
+function toggleSidebar() { document.getElementById('adminSidebar').classList.toggle('collapsed'); }
+</script>
+</body>
+</html>

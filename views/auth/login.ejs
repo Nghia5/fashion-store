@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Đăng nhập | Fashion Store</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="/css/auth.css">
+</head>
+<body class="auth-page">
+
+<% if (typeof success !== 'undefined' && success && success.length) { %><div style="position:fixed;top:20px;right:20px;background:#4caf50;color:#fff;padding:12px 20px;border-radius:6px;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,0.15);font-size:0.88rem"><i class="fas fa-check-circle"></i> <%= success[0] %></div><% } %>
+<% if (typeof error !== 'undefined' && error && error.length) { %><div style="position:fixed;top:20px;right:20px;background:#e74c3c;color:#fff;padding:12px 20px;border-radius:6px;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,0.15);font-size:0.88rem"><i class="fas fa-exclamation-circle"></i> <%= error[0] %></div><% } %>
+
+<!-- Top Bar -->
+<div class="auth-topbar">
+  <div class="auth-topbar-inner">
+    <div class="auth-topbar-left">
+      <a href="/" class="auth-topbar-logo">✦ FASHION<span>STORE</span></a>
+      <span class="auth-topbar-title">Đăng Nhập</span>
+    </div>
+    <a href="/" class="auth-topbar-help">Bạn cần giúp đỡ?</a>
+  </div>
+</div>
+
+<!-- Main -->
+<div class="auth-main">
+  <div class="auth-bg-image" style="background-image:url('https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=1600&auto=format&fit=crop')"></div>
+  <div class="auth-bg-overlay"></div>
+
+  <!-- Promo Side -->
+  <div class="auth-promo">
+    <div class="auth-promo-logo"><i class="fas fa-star"></i> FASHION STORE</div>
+    <h2>THỜI TRANG<br><em>PHONG CÁCH</em><br>ĐẲNG CẤP</h2>
+    <p>Mua sắm thời trang cao cấp với hàng nghìn sản phẩm chính hãng</p>
+    <div class="auth-promo-tags">
+      <span class="auth-promo-tag">✨ FREESHIP ĐƠN TỪ 300K</span>
+      <span class="auth-promo-tag">🎁 GIẢM 20% ĐƠN ĐẦU</span>
+      <span class="auth-promo-tag">🛡️ CHÍNH HÃNG 100%</span>
+    </div>
+  </div>
+
+  <!-- Login Form -->
+  <div class="auth-card-wrap">
+    <div class="auth-form-card">
+      <h1>Đăng Nhập</h1>
+
+      <form action="/auth/login" method="POST">
+        <div class="auth-field">
+          <div class="auth-input-icon">
+            <i class="fas fa-envelope"></i>
+            <input type="email" name="email" class="auth-input" placeholder="Email của bạn" required autofocus>
+          </div>
+        </div>
+
+        <div class="auth-field">
+          <div class="auth-input-icon">
+            <i class="fas fa-lock"></i>
+            <input type="password" name="password" class="auth-input" placeholder="Mật khẩu" required>
+          </div>
+        </div>
+
+        <div class="auth-options">
+          <label class="auth-remember">
+            <input type="checkbox" checked> Duy trì đăng nhập
+          </label>
+          <a href="#" class="auth-forgot">Quên mật khẩu?</a>
+        </div>
+
+        <button type="submit" class="auth-submit">ĐĂNG NHẬP</button>
+      </form>
+
+      <div class="auth-divider">HOẶC</div>
+
+      <div class="auth-social">
+        <button class="auth-social-btn fb"><i class="fab fa-facebook"></i> Facebook</button>
+        <button class="auth-social-btn gg"><i class="fab fa-google"></i> Google</button>
+      </div>
+
+      <div class="auth-switch">
+        Chưa có tài khoản? <a href="/auth/register">Đăng ký ngay</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Footer -->
+<div class="auth-footer">
+  &copy; 2024 Fashion Store. Tất cả quyền được bảo lưu.
+</div>
+
+<script>setTimeout(() => { document.querySelectorAll('[style*="fixed"]').forEach(el => el.remove()); }, 4000);</script>
+</body>
+</html>

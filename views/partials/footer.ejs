@@ -1,0 +1,80 @@
+﻿<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <!-- Brand -->
+      <div class="footer-brand">
+        <a href="/" class="footer-logo">
+          <span class="logo-icon">✦</span> FASHION<span class="logo-accent">STORE</span>
+        </a>
+        <p>Thời trang cao cấp cho nam và nữ. Phong cách là ngôn ngữ của bạn.</p>
+        <div class="social-links">
+          <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+          <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+          <a href="#" aria-label="Tiktok"><i class="fab fa-tiktok"></i></a>
+          <a href="#" aria-label="Youtube"><i class="fab fa-youtube"></i></a>
+        </div>
+      </div>
+
+      <!-- Links -->
+      <div class="footer-links">
+        <h4>Danh mục</h4>
+        <ul>
+          <li><a href="/products?gender=male">Thời trang Nam</a></li>
+          <li><a href="/products?gender=female">Thời trang Nữ</a></li>
+          <li><a href="/products?sort=popular">Bán chạy nhất</a></li>
+          <li><a href="/products?isNewArrival=true">Hàng mới về</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-links">
+        <h4>Hỗ trợ</h4>
+        <ul>
+          <li><a href="#">Chính sách đổi trả</a></li>
+          <li><a href="#">Hướng dẫn chọn size</a></li>
+          <li><a href="#">Chính sách vận chuyển</a></li>
+          <li><a href="#">Câu hỏi thường gặp</a></li>
+        </ul>
+      </div>
+
+      <!-- Contact -->
+      <div class="footer-contact">
+        <h4>Liên hệ</h4>
+        <p><i class="fas fa-map-marker-alt"></i> 123 Đường Thời Trang, Quận 1, TP.HCM</p>
+        <p><i class="fas fa-phone"></i> 1800 1234 (Miễn phí)</p>
+        <p><i class="fas fa-envelope"></i> hello@fashionstore.vn</p>
+        <p><i class="fas fa-clock"></i> T2 – T7: 8:00 – 20:00</p>
+        <div class="payment-icons" style="display:flex;gap:10px;align-items:center;margin-top:10px">
+          <i class="fab fa-cc-visa" style="font-size: 2.5rem; color: #fff;"></i>
+          <i class="fab fa-cc-mastercard" style="font-size: 2.5rem; color: #fff;"></i>
+          <span style="font-weight: bold; background: #a50064; color: white; padding: 5px 10px; border-radius: 6px; font-size: 1.2rem; font-style: italic;">MoMo</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p>&copy; <%= new Date().getFullYear() %> Fashion Store. All rights reserved. Made with <i class="fas fa-heart" style="color:#c9a96e"></i></p>
+    </div>
+  </div>
+</footer>
+
+<!-- Chatbot -->
+<div class="chatbot-container" id="chatbot">
+  <button class="chatbot-toggle" id="chatbotToggle"><i class="fas fa-comment-dots"></i></button>
+  <div class="chatbot-window" id="chatbotWindow">
+    <div class="chatbot-header">
+      <div class="chatbot-title"><i class="fas fa-headset"></i> Chăm sóc khách hàng</div>
+      <button class="chatbot-close" id="chatbotClose"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="chatbot-body" id="chatbotBody">
+      <div class="chat-msg bot"><p>Xin chào! Fashion Store có thể giúp gì cho bạn hôm nay?</p><div class="chat-suggestions"><button class="chat-chip">Áo nam</button><button class="chat-chip">Tư vấn size</button><button class="chat-chip">Đồ khuyến mãi</button></div></div>
+    </div>
+    <div class="chatbot-footer">
+      <input type="text" id="chatbotInput" placeholder="Nhập tin nhắn..." autocomplete="off">
+      <button id="chatbotSend"><i class="fas fa-paper-plane"></i></button>
+    </div>
+  </div>
+</div>
+
+
+
+

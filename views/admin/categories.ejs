@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quản lý danh mục | Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="admin-body">
+<%- include('../partials/admin-sidebar') %>
+
+<div class="admin-main">
+  <div class="admin-topbar">
+    <button class="sidebar-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+    <h2>Quản lý Danh mục</h2>
+  </div>
+
+  <div class="admin-content">
+    <% if (typeof success !== 'undefined' && success && success.length) { %><div class="flash flash-success"><%= success[0] %></div><% } %>
+    <% if (typeof error !== 'undefined' && error && error.length) { %><div class="flash flash-error"><%= error[0] %></div><% } %>
+
+    <div class="admin-two-col">
+      <div class="admin-card">
+        <div class="admin-card-header"><h3>Thêm danh mục mới</h3></div>
+        <form action="/admin/categories" method="POST" enctype="multipart/form-data" class="admin-form" style="padding:1.5rem">
+          <div class="form-group">
+            <label class="form-label">Tên danh mục <span class="required">*</span></label>
+            <input type="text" name="name" class="form-input" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Giới tính</label>
+            <select name="gender" class="form-select">
+              <option value="unisex">Unisex</option>
+              <option value="male">Nam</option>
+              <option value="female">Nữ</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Mô tả</label>
+            <textarea name="description" class="form-input" rows="3"></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Hình ảnh</label>
+            <input type="file" name="image" class="form-input" accept="image/*">
+          </div>
+          <button type="submit" class="btn btn-primary btn-full" style="margin-top:1rem">Thêm danh mục</button>
+        </form>
+      </div>
+
+      <div class="admin-card">
+        <div class="admin-card-header"><h3>Danh sách danh mục</h3></div>
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Ảnh</th>
+                <th>Tên</th>
+                <th>Giới tính</th>
+                <th>Hành động</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% categories.forEach(cat => { %>
+              <tr id="cat-<%= cat.Id %>">
+                <td><img src="<%= cat.Image || 'https://via.placeholder.com/100x100?text=Cat' %>" alt="<%= cat.Name %>" style="width:50px;height:50px;object-fit:cover;border-radius:8px"></td>
+                <td><strong><%= cat.Name %></strong></td>
+                <td><%= cat.Gender==='male'?'Nam':(cat.Gender==='female'?'Nữ':'Unisex') %></td>
+                <td>
+                  <button class="btn btn-danger btn-xs" onclick="deleteCategory('<%= cat.Id %>')" title="Xóa">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </td>
+              </tr>
+              <% }); %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function deleteCategory(id) {
+  if (!confirm('Ẩn danh mục này?')) return;
+  fetch('/admin/categories/' + id, { method: 'DELETE' })
+    .then(r => r.json())
+    .then(data => {
+      if (data.success) { document.getElementById('cat-' + id)?.remove(); }
+      else { alert(data.message || 'Lỗi'); }
+    });
+}
+function toggleSidebar() { document.getElementById('adminSidebar').classList.toggle('collapsed'); }
+</script>
+</body>
+</html>

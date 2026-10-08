@@ -1,0 +1,148 @@
+<%
+  const formatPrice = (price) => price ? Number(price).toLocaleString('vi-VN') + 'đ' : '0đ';
+  const getImg = (product) => {
+    try {
+      const imgs = JSON.parse(product.Images || '[]');
+      return imgs[0] || '/images/product-default.jpg';
+    } catch(e) {
+      return '/images/product-default.jpg';
+    }
+  };
+%>
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quản lý sản phẩm | Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="admin-body">
+<%- include('../partials/admin-sidebar') %>
+
+<div class="admin-main">
+  <div class="admin-topbar">
+    <button class="sidebar-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+    <h2>Quản lý Sản phẩm</h2>
+    <div class="topbar-right">
+      <a href="/admin/products/add" class="btn btn-primary"><i class="fas fa-plus"></i> Thêm sản phẩm</a>
+    </div>
+  </div>
+
+  <div class="admin-content">
+    <% if (typeof success !== 'undefined' && success && success.length) { %><div class="flash flash-success"><i class="fas fa-check-circle"></i> <%= success[0] %></div><% } %>
+    <% if (typeof error !== 'undefined' && error && error.length) { %><div class="flash flash-error"><i class="fas fa-exclamation-circle"></i> <%= error[0] %></div><% } %>
+
+    <div class="admin-filters" style="margin-bottom: 2rem;">
+      <form action="/admin/products" method="GET" class="filters-form">
+        <input type="text" name="search" class="filter-input" placeholder="Tìm theo tên..." value="<%= filters.search||'' %>">
+        <select name="sort" class="filter-select">
+          <option value="-createdAt" <%= filters.sort==='-createdAt'?'selected':'' %>>Mới nhất</option>
+          <option value="price" <%= filters.sort==='price'?'selected':'' %>>Giá tăng dần</option>
+          <option value="-price" <%= filters.sort==='-price'?'selected':'' %>>Giá giảm dần</option>
+          <option value="-sold" <%= filters.sort==='-sold'?'selected':'' %>>Bán chạy</option>
+        </select>
+        <button type="submit" class="btn btn-outline">Lọc</button>
+      </form>
+    </div>
+
+    <div class="admin-card">
+      <div class="admin-table-wrap">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Hình ảnh</th>
+              <th>Tên sản phẩm</th>
+              <th>Danh mục</th>
+              <th>Giới tính</th>
+              <th>Giá</th>
+              <th>Đã bán</th>
+              <th>Trạng thái</th>
+              <th>Hành động</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% products.forEach(product => { %>
+            <tr id="prod-row-<%= product.Id %>">
+              <td>
+                <img src="<%= getImg(product) %>" alt="<%= product.Name %>" class="admin-product-thumb">
+              </td>
+              <td>
+                <div style="max-width: 250px; white-space: normal;">
+                  <strong><%= product.Name %></strong>
+                  <% if (product.IsFeatured) { %><span class="badge badge-new" style="font-size:0.65rem; margin-left:8px;">Nổi bật</span><% } %>
+                </div>
+              </td>
+              <td><%= product.CategoryName || 'N/A' %></td>
+              <td><%= product.Gender === 'male' ? 'Nam' : (product.Gender === 'female' ? 'Nữ' : 'Unisex') %></td>
+              <td>
+                <% if (product.SalePrice) { %>
+                  <div class="text-gold" style="font-weight:600;"><%= formatPrice(product.SalePrice) %></div>
+                  <div class="text-gray" style="text-decoration:line-through; font-size:0.85rem;"><%= formatPrice(product.Price) %></div>
+                <% } else { %>
+                  <div style="font-weight:600;"><%= formatPrice(product.Price) %></div>
+                <% } %>
+              </td>
+              <td><%= product.Sold %></td>
+              <td>
+                <span class="status-badge <%= product.IsActive?'status-delivered':'status-cancelled' %>">
+                  <%= product.IsActive ? 'Đang bán' : 'Ẩn' %>
+                </span>
+              </td>
+              <td>
+                <div class="actions-cell">
+                  <a href="/admin/products/<%= product.Id %>/edit" class="btn btn-outline btn-xs" title="Chỉnh sửa">
+                    <i class="fas fa-edit"></i>
+                  </a>
+                  <button class="btn btn-danger btn-xs" onclick="deleteProduct('<%= product.Id %>')" title="Xóa">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      </div>
+
+      <% if (totalPages > 1) { %>
+      <div class="pagination" style="padding:1rem;">
+        <% for(let i=1; i<=totalPages; i++) { %>
+        <a href="?search=<%= filters.search||'' %>&sort=<%= filters.sort||'' %>&page=<%= i %>"
+           class="page-btn <%= i===currentPage?'active':'' %>"><%= i %></a>
+        <% } %>
+      </div>
+      <% } %>
+    </div>
+  </div>
+</div>
+
+<script>
+function deleteProduct(id) {
+  if (!confirm('Ẩn sản phẩm này?')) return;
+  fetch('/admin/products/' + id, { method: 'DELETE' })
+    .then(r => r.json())
+    .then(data => {
+      if (data.success) {
+        const row = document.getElementById('prod-row-' + id);
+        if (row) row.remove();
+        showAdminToast('Đã ẩn sản phẩm', 'success');
+      } else {
+        showAdminToast(data.message || 'Lỗi', 'error');
+      }
+    });
+}
+function showAdminToast(msg, type) {
+  const d = document.createElement('div');
+  d.className = 'flash flash-' + type;
+  d.textContent = msg;
+  document.body.appendChild(d);
+  setTimeout(() => d.remove(), 3000);
+}
+function toggleSidebar() { document.getElementById('adminSidebar').classList.toggle('collapsed'); }
+</script>
+</body>
+</html>

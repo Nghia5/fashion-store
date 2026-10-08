@@ -1,0 +1,392 @@
+<%
+  const formatPrice = (price) => price ? price.toLocaleString('vi-VN') + 'đ' : '0đ';
+%>
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Thanh toán | Fashion Store</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/shopee.css?v=6">
+  <style>
+    /* ---- Checkout Redesign ---- */
+    .checkout-page {
+      max-width: 1200px; margin: 0 auto;
+      padding: 30px 15px 60px;
+      padding-top: 30px;
+      margin-top: 10px;
+      font-family: 'Inter', sans-serif;
+    }
+    .checkout-breadcrumb {
+      font-size: 0.85rem; color: #999; margin-bottom: 20px;
+    }
+    .checkout-breadcrumb a { color: #999; text-decoration: none; }
+    .checkout-breadcrumb a:hover { color: #d4a574; }
+    .checkout-breadcrumb i { font-size: 0.65rem; margin: 0 6px; }
+
+    /* Progress Steps */
+    .steps-container {
+      background: #fff; padding: 20px 0; border-radius: 8px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06); margin-bottom: 24px;
+      display: flex; justify-content: center; align-items: center;
+    }
+    .step-item {
+      display: flex; flex-direction: column; align-items: center; gap: 8px;
+      position: relative; z-index: 1; width: 120px;
+    }
+    .step-icon {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: #f0f0f0; color: #999; font-size: 1.1rem;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 600; transition: all 0.3s;
+    }
+    .step-text { font-size: 0.85rem; color: #999; font-weight: 500; }
+    
+    .step-item.active .step-icon {
+      background: linear-gradient(135deg, #d4a574, #c49565); color: #fff;
+      box-shadow: 0 4px 10px rgba(212,165,116,0.3);
+    }
+    .step-item.active .step-text { color: #d4a574; font-weight: 600; }
+    
+    .step-line {
+      height: 3px; width: 100px; background: #f0f0f0; margin: 0 -30px 24px; z-index: 0;
+    }
+
+    .checkout-wrapper {
+      display: grid;
+      grid-template-columns: 1fr 400px;
+      gap: 24px;
+      align-items: start;
+    }
+
+    /* Left: Form */
+    .checkout-box {
+      background: #fff; border-radius: 8px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+      overflow: hidden; margin-bottom: 24px;
+    }
+    .cb-header {
+      padding: 16px 20px; background: #fef9f4;
+      border-bottom: 1px solid #f0e6db;
+      font-size: 1.05rem; font-weight: 600; color: #333;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .cb-header i { color: #d4a574; }
+    .cb-body { padding: 24px; }
+
+    /* Form Fields */
+    .form-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+    }
+    .form-group.full { grid-column: span 2; }
+    .form-label {
+      display: block; font-size: 0.85rem; font-weight: 600;
+      color: #555; margin-bottom: 6px;
+    }
+    .form-label .req { color: #e74c3c; }
+    .form-input {
+      width: 100%; border: 1px solid #ddd; border-radius: 6px;
+      padding: 10px 14px; font-size: 0.95rem; font-family: 'Inter', sans-serif;
+      transition: all 0.2s; outline: none; background: #fff;
+    }
+    .form-input:focus { border-color: #d4a574; box-shadow: 0 0 0 3px rgba(212,165,116,0.1); }
+    textarea.form-input { resize: vertical; min-height: 80px; }
+
+    /* Payment Methods */
+    .payment-options { display: flex; flex-direction: column; gap: 12px; }
+    .payment-opt {
+      display: flex; align-items: center; gap: 16px;
+      border: 1px solid #ddd; border-radius: 8px; padding: 14px 16px;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .payment-opt:hover { border-color: #d4a574; background: #fef9f4; }
+    .payment-opt.active {
+      border-color: #d4a574; background: #fef9f4;
+      box-shadow: 0 2px 8px rgba(212,165,116,0.15);
+    }
+    .payment-opt input { display: none; }
+    .pay-icon {
+      width: 44px; height: 44px; border-radius: 8px;
+      background: #fff; border: 1px solid #eee;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem; color: #d4a574;
+    }
+    .pay-info h4 { margin: 0 0 4px; font-size: 0.95rem; color: #333; }
+    .pay-info p { margin: 0; font-size: 0.8rem; color: #888; }
+    
+    .payment-opt.active .pay-icon { background: linear-gradient(135deg, #d4a574, #c49565); color: #fff; border-color: transparent; }
+
+    /* QR Section */
+    .qr-section {
+      margin-top: 16px; padding: 20px; background: #f9f9f9;
+      border-radius: 8px; border: 1px dashed #ccc; text-align: center;
+      display: none; animation: fadeIn 0.3s ease;
+    }
+    .qr-section h5 { font-size: 0.95rem; margin-bottom: 12px; color: #333; }
+    .qr-img { width: 180px; height: 180px; margin: 0 auto 12px; border-radius: 8px; border: 1px solid #eee; padding: 8px; background: #fff; }
+    .qr-hint { font-size: 0.85rem; color: #666; }
+    .qr-hint strong { color: #d4a574; font-size: 1rem; }
+
+    /* Right: Order Summary */
+    .summary-box {
+      background: #fff; border-radius: 8px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+      position: sticky; top: 140px;
+    }
+    .sb-body { padding: 20px; }
+    
+    .checkout-items-list {
+      max-height: 300px; overflow-y: auto; padding-right: 8px;
+      margin-bottom: 20px;
+    }
+    .checkout-items-list::-webkit-scrollbar { width: 4px; }
+    .checkout-items-list::-webkit-scrollbar-thumb { background: #ddd; border-radius: 2px; }
+
+    .ci-row {
+      display: flex; align-items: center; gap: 12px;
+      margin-bottom: 16px; position: relative;
+    }
+    .ci-row:last-child { margin-bottom: 0; }
+    .ci-img-wrap { position: relative; }
+    .ci-img {
+      width: 60px; height: 60px; border-radius: 6px;
+      object-fit: cover; border: 1px solid #eee;
+    }
+    .ci-qty-badge {
+      position: absolute; top: -6px; right: -6px;
+      background: #666; color: #fff; font-size: 0.75rem;
+      width: 20px; height: 20px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 600;
+    }
+    .ci-info { flex: 1; }
+    .ci-name { font-size: 0.88rem; font-weight: 600; color: #333; margin-bottom: 4px; }
+    .ci-variants { font-size: 0.78rem; color: #999; }
+    .ci-price { font-size: 0.9rem; font-weight: 600; color: #555; }
+
+    .sb-row {
+      display: flex; justify-content: space-between;
+      margin-bottom: 12px; font-size: 0.9rem; color: #666;
+    }
+    .sb-row .val { font-weight: 600; color: #333; }
+    .sb-divider { height: 1px; background: #eee; margin: 16px 0; }
+    .sb-total {
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .sb-total .lbl { font-size: 1.05rem; font-weight: 700; color: #333; }
+    .sb-total .val { font-size: 1.4rem; font-weight: 800; color: #d4a574; }
+
+    .btn-submit {
+      width: 100%; padding: 14px; margin-top: 24px;
+      background: linear-gradient(135deg, #d4a574, #c49565);
+      border: none; border-radius: 8px; color: #fff;
+      font-size: 1.05rem; font-weight: 700; cursor: pointer;
+      transition: all 0.2s; box-shadow: 0 4px 12px rgba(212,165,116,0.3);
+    }
+    .btn-submit:hover {
+      transform: translateY(-2px); box-shadow: 0 6px 16px rgba(212,165,116,0.4);
+    }
+
+    @keyframes fadeIn { from { opacity:0; transform:translateY(-5px); } to { opacity:1; transform:translateY(0); } }
+
+    @media (max-width: 992px) {
+      .checkout-wrapper { grid-template-columns: 1fr; }
+      .summary-box { position: static; order: -1; }
+    }
+    @media (max-width: 768px) {
+      .form-grid { grid-template-columns: 1fr; }
+      .form-group.full { grid-column: span 1; }
+    }
+  </style>
+</head>
+<body>
+<% if (error && error.length) { %><div class="flash flash-error"><i class="fas fa-exclamation-circle"></i> <%= error[0] %><button class="flash-close" onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button></div><% } %>
+<%- include('./partials/navbar') %>
+
+<div class="checkout-page">
+  <!-- Breadcrumb -->
+  <div class="checkout-breadcrumb">
+    <a href="/"><i class="fas fa-home"></i> Trang chủ</a>
+    <i class="fas fa-chevron-right"></i>
+    <a href="/cart">Giỏ hàng</a>
+    <i class="fas fa-chevron-right"></i>
+    <span style="color:#333; font-weight:500;">Thanh toán</span>
+  </div>
+
+  <div class="steps-container">
+    <div class="step-item active">
+      <div class="step-icon">1</div>
+      <div class="step-text">Giao hàng</div>
+    </div>
+    <div class="step-line" style="background:#d4a574;"></div>
+    <div class="step-item active">
+      <div class="step-icon">2</div>
+      <div class="step-text">Thanh toán</div>
+    </div>
+    <div class="step-line"></div>
+    <div class="step-item">
+      <div class="step-icon">3</div>
+      <div class="step-text">Hoàn tất</div>
+    </div>
+  </div>
+
+  <form action="/orders/checkout" method="POST" id="checkoutForm">
+    <div class="checkout-wrapper">
+      <!-- Left: Forms -->
+      <div class="checkout-main">
+        <!-- Shipping Box -->
+        <div class="checkout-box">
+          <div class="cb-header"><i class="fas fa-map-marked-alt"></i> 1. Địa chỉ giao hàng</div>
+          <div class="cb-body">
+            <div class="form-grid">
+              <div class="form-group full">
+                <label class="form-label">Họ và tên <span class="req">*</span></label>
+                <input type="text" name="fullName" class="form-input" value="<%= user?.name || '' %>" required placeholder="Ví dụ: Nguyễn Văn A">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Số điện thoại <span class="req">*</span></label>
+                <input type="tel" name="phone" class="form-input" value="<%= user?.phone || '' %>" required placeholder="0901 234 567">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Tỉnh/Thành phố <span class="req">*</span></label>
+                <select name="city" class="form-input" required>
+                  <option value="">-- Chọn Tỉnh/Thành phố --</option>
+                  <% ['TP. Hồ Chí Minh','Hà Nội','Đà Nẵng','Hải Phòng','Cần Thơ','Biên Hòa','Nha Trang','Huế','Đà Lạt','Vũng Tàu','Bình Dương','Long An','Tiền Giang','Khánh Hòa','Nghệ An','Thanh Hóa','Bắc Ninh','Thái Nguyên'].forEach(city => { %>
+                    <option value="<%= city %>"><%= city %></option>
+                  <% }); %>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Quận/Huyện <span class="req">*</span></label>
+                <input type="text" name="district" class="form-input" required placeholder="Ví dụ: Quận 1">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Địa chỉ chi tiết <span class="req">*</span></label>
+                <input type="text" name="street" class="form-input" required placeholder="Số nhà, Tên đường, Phường/Xã...">
+              </div>
+              <div class="form-group full">
+                <label class="form-label">Ghi chú đơn hàng</label>
+                <textarea name="note" class="form-input" placeholder="Ghi chú cho shipper (Không bắt buộc)"></textarea>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Payment Box -->
+        <div class="checkout-box">
+          <div class="cb-header"><i class="fas fa-wallet"></i> 2. Phương thức thanh toán</div>
+          <div class="cb-body">
+            <div class="payment-options">
+              <label class="payment-opt active" onclick="selectPayment(this, 'cod')">
+                <input type="radio" name="paymentMethod" value="cod" checked>
+                <div class="pay-icon"><i class="fas fa-hand-holding-usd"></i></div>
+                <div class="pay-info">
+                  <h4>Thanh toán khi nhận hàng (COD)</h4>
+                  <p>Trực tiếp thanh toán bằng tiền mặt khi shipper giao hàng</p>
+                </div>
+              </label>
+
+              <label class="payment-opt" onclick="selectPayment(this, 'bank')">
+                <input type="radio" name="paymentMethod" value="bank_transfer">
+                <div class="pay-icon"><i class="fas fa-building-columns"></i></div>
+                <div class="pay-info">
+                  <h4>Chuyển khoản Ngân hàng</h4>
+                  <p>Quét mã VietQR để thanh toán nhanh chóng</p>
+                </div>
+              </label>
+
+              <label class="payment-opt" onclick="selectPayment(this, 'momo')">
+                <input type="radio" name="paymentMethod" value="momo">
+                <div class="pay-icon" style="color:#d82d8b;"><i class="fas fa-wallet"></i></div>
+                <div class="pay-info">
+                  <h4>Thanh toán qua Ví MoMo</h4>
+                  <p>Sử dụng ứng dụng MoMo quét mã thanh toán</p>
+                </div>
+              </label>
+            </div>
+
+            <div class="qr-section" id="qrSection">
+              <h5>Vui lòng quét mã QR dưới đây để thanh toán:</h5>
+              <img src="" alt="QR Code" class="qr-img" id="qrImage">
+              <div class="qr-hint">Nội dung chuyển khoản: <br><strong>FS<%= user?._id?.toString().substr(-6).toUpperCase() || 'NEW' %></strong></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Summary -->
+      <div class="summary-box">
+        <div class="cb-header"><i class="fas fa-shopping-bag"></i> Đơn hàng của bạn</div>
+        <div class="sb-body">
+          <div class="checkout-items-list">
+            <% cart.items.forEach(item => { %>
+              <div class="ci-row">
+                <div class="ci-img-wrap">
+                  <img src="<%= item.Image || '/images/product-default.jpg' %>" alt="" class="ci-img">
+                  <span class="ci-qty-badge"><%= item.Quantity %></span>
+                </div>
+                <div class="ci-info">
+                  <div class="ci-name"><%= item.Name %></div>
+                  <% if (item.Color || item.Size) { %>
+                    <div class="ci-variants"><%= item.Color %> <%= item.Size ? '/ ' + item.Size : '' %></div>
+                  <% } %>
+                </div>
+                <div class="ci-price"><%= formatPrice((Number(item.Price)||item.price||0) * item.Quantity) %></div>
+              </div>
+            <% }); %>
+          </div>
+
+          <div class="sb-divider"></div>
+          
+          <div class="sb-row">
+            <span>Tạm tính</span>
+            <span class="val"><%= formatPrice(subtotal) %></span>
+          </div>
+          <div class="sb-row">
+            <span>Phí vận chuyển</span>
+            <span class="val" style="color:#d4a574;"><%= shippingFee === 0 ? '✓ Miễn phí' : formatPrice(shippingFee) %></span>
+          </div>
+
+          <div class="sb-divider"></div>
+
+          <div class="sb-total">
+            <span class="lbl">Tổng thanh toán</span>
+            <span class="val"><%= formatPrice(total) %></span>
+          </div>
+
+          <button type="submit" class="btn-submit">
+            <i class="fas fa-check"></i> Đặt Hàng Ngay
+          </button>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+
+<%- include('./partials/footer') %>
+<button class="scroll-top" id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="fas fa-arrow-up"></i></button>
+
+<script>
+function selectPayment(el, type) {
+  document.querySelectorAll('.payment-opt').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  const qrSection = document.getElementById('qrSection');
+  const qrImage = document.getElementById('qrImage');
+  
+  if (type === 'bank') {
+    qrSection.style.display = 'block';
+    qrImage.src = 'https://api.vietqr.io/image/970436-123456789-9V22B9W.jpg?accountName=FASHION%20STORE&amount=<%= total %>';
+  } else if (type === 'momo') {
+    qrSection.style.display = 'block';
+    qrImage.src = 'https://upload.wikimedia.org/wikipedia/commons/d/d0/QR_code_for_mobile_English_Wikipedia.svg'; 
+  } else {
+    qrSection.style.display = 'none';
+  }
+}
+</script>
+<script src="/js/main.js"></script>
+</body>
+</html>

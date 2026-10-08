@@ -1,0 +1,284 @@
+<%
+  const formatPrice = (p) => p ? Number(p).toLocaleString('vi-VN') + 'đ' : '0đ';
+  const statusMap = { pending:'Chờ xác nhận', confirmed:'Đã xác nhận', shipping:'Đang giao hàng', delivered:'Đã giao hàng', cancelled:'Đã hủy' };
+  const statusCls = { pending:'status-pending', confirmed:'status-confirmed', shipping:'status-shipping', delivered:'status-delivered', cancelled:'status-cancelled' };
+  const si = { label: statusMap[order.OrderStatus] || order.OrderStatus, cls: statusCls[order.OrderStatus] || 'status-pending' };
+  const steps = ['pending','confirmed','shipping','delivered'];
+  const currentStep = steps.indexOf(order.OrderStatus);
+  const pmMap = { cod:'Thanh toán khi nhận hàng (COD)', bank_transfer:'Chuyển khoản / QR Code', momo:'Ví MoMo' };
+%>
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Đơn hàng #<%= order.OrderNumber %> | Fashion Store</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/shopee.css?v=6">
+  <style>
+    .order-detail-page {
+      max-width: 900px; margin: 0 auto;
+      padding: 30px 15px 80px;
+      padding-top: 40px; margin-top: 10px;
+      font-family: 'Inter', sans-serif;
+    }
+    .od-breadcrumb {
+      font-size: 0.85rem; color: #999; margin-bottom: 24px;
+    }
+    .od-breadcrumb a { color: #999; text-decoration: none; }
+    .od-breadcrumb a:hover { color: #d4a574; }
+    .od-breadcrumb i { font-size: 0.65rem; margin: 0 6px; }
+
+    .od-header-row {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 30px; flex-wrap: wrap; gap: 16px;
+    }
+    .od-title {
+      font-family: 'Playfair Display', serif; font-size: 2.2rem;
+      color: #333; margin: 0;
+    }
+    .od-meta {
+      font-size: 0.95rem; color: #666; display: flex; gap: 16px; align-items: center;
+    }
+    .od-badge {
+      padding: 6px 14px; border-radius: 6px; font-weight: 600; font-size: 0.9rem;
+    }
+    .od-badge.status-pending { background: #fff3cd; color: #856404; }
+    .od-badge.status-confirmed { background: #cce5ff; color: #004085; }
+    .od-badge.status-shipping { background: #e2e3e5; color: #383d41; }
+    .od-badge.status-delivered { background: #d4edda; color: #155724; }
+    .od-badge.status-cancelled { background: #f8d7da; color: #721c24; }
+
+    /* Modern Tracker */
+    .od-tracker {
+      background: #fff; border-radius: 12px; padding: 30px 20px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.04); margin-bottom: 24px;
+      display: flex; justify-content: space-between; position: relative;
+    }
+    .od-tracker::before {
+      content: ''; position: absolute; top: 46px; left: 10%; right: 10%;
+      height: 4px; background: #f0f0f0; z-index: 0; border-radius: 2px;
+    }
+    .od-step {
+      position: relative; z-index: 1; flex: 1; text-align: center;
+    }
+    .od-step-icon {
+      width: 48px; height: 48px; border-radius: 50%; margin: 0 auto 12px;
+      background: #f0f0f0; color: #999; font-size: 1.2rem;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.3s;
+    }
+    .od-step-label { font-size: 0.85rem; font-weight: 600; color: #999; transition: color 0.3s; }
+    
+    .od-step.active .od-step-icon {
+      background: linear-gradient(135deg, #d4a574, #c49565); color: #fff;
+      box-shadow: 0 4px 12px rgba(212,165,116,0.3);
+    }
+    .od-step.active .od-step-label { color: #d4a574; }
+
+    /* Tracker Progress Fill */
+    .od-tracker-fill {
+      position: absolute; top: 46px; left: 10%; height: 4px;
+      background: linear-gradient(90deg, #d4a574, #c49565); z-index: 0;
+      transition: width 0.5s ease; border-radius: 2px;
+    }
+
+    /* Cards */
+    .od-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px;
+    }
+    .od-card {
+      background: #fff; border-radius: 12px; padding: 24px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.04);
+    }
+    .od-card h3 {
+      font-size: 1.05rem; color: #333; margin-bottom: 16px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .od-card h3 i { color: #d4a574; }
+    .od-card p { margin-bottom: 8px; color: #555; font-size: 0.95rem; }
+    .od-card p:last-child { margin-bottom: 0; }
+    
+    /* Summary Row */
+    .od-summary-row {
+      display: flex; justify-content: space-between; margin-bottom: 12px;
+      color: #666; font-size: 0.95rem;
+    }
+    .od-summary-row .val { font-weight: 600; color: #333; }
+    .od-summary-divider { height: 1px; background: #eee; margin: 12px 0; }
+    .od-total-row {
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 1.1rem; color: #333; font-weight: 700;
+    }
+    .od-total-row .val { font-size: 1.5rem; color: #d4a574; font-weight: 800; }
+
+    /* Product List */
+    .od-items {
+      background: #fff; border-radius: 12px; padding: 24px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.04); margin-bottom: 32px;
+    }
+    .oi-row {
+      display: flex; align-items: center; gap: 16px;
+      padding: 16px 0; border-bottom: 1px solid #f0f0f0;
+    }
+    .oi-row:last-child { border-bottom: none; padding-bottom: 0; }
+    .oi-img {
+      width: 70px; height: 70px; object-fit: cover; border-radius: 8px;
+      border: 1px solid #f5f5f5;
+    }
+    .oi-info { flex: 1; }
+    .oi-name { font-size: 0.95rem; font-weight: 600; color: #333; margin-bottom: 6px; }
+    .oi-variants { font-size: 0.85rem; color: #888; }
+    .oi-price { font-weight: 600; color: #d4a574; font-size: 1rem; }
+
+    /* Actions */
+    .od-actions { display: flex; gap: 16px; flex-wrap: wrap; }
+    .btn-back {
+      padding: 12px 24px; border-radius: 8px; border: 1px solid #ddd;
+      color: #555; text-decoration: none; font-weight: 600; transition: all 0.2s;
+    }
+    .btn-back:hover { border-color: #d4a574; color: #d4a574; background: #fef9f4; }
+    
+    .btn-cancel {
+      padding: 12px 24px; border-radius: 8px; background: #fff; border: 1px solid #e74c3c;
+      color: #e74c3c; font-weight: 600; cursor: pointer; transition: all 0.2s;
+    }
+    .btn-cancel:hover { background: #e74c3c; color: #fff; }
+
+    @media (max-width: 768px) {
+      .od-grid { grid-template-columns: 1fr; }
+      .od-tracker::before { left: 15%; right: 15%; }
+      .od-tracker-fill { left: 15%; }
+    }
+  </style>
+</head>
+<body>
+<% if (success && success.length) { %><div class="flash flash-success"><i class="fas fa-check-circle"></i> <%= success[0] %><button class="flash-close" onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button></div><% } %>
+<% if (error && error.length) { %><div class="flash flash-error"><i class="fas fa-exclamation-circle"></i> <%= error[0] %><button class="flash-close" onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button></div><% } %>
+<%- include('../partials/navbar') %>
+
+<div class="order-detail-page">
+  <!-- Breadcrumb -->
+  <div class="od-breadcrumb">
+    <a href="/"><i class="fas fa-home"></i> Trang chủ</a>
+    <i class="fas fa-chevron-right"></i>
+    <a href="/orders">Đơn hàng</a>
+    <i class="fas fa-chevron-right"></i>
+    <span style="color:#333; font-weight:500;">Chi tiết đơn hàng #<%= order.OrderNumber %></span>
+  </div>
+
+  <div class="od-header-row">
+    <h1 class="od-title">Chi Tiết Đơn Hàng</h1>
+    <div class="od-meta">
+      <span><i class="far fa-calendar-alt"></i> <%= new Date(order.CreatedAt).toLocaleDateString('vi-VN') %></span>
+      <span>|</span>
+      <span>Mã ĐH: <strong>#<%= order.OrderNumber %></strong></span>
+      <span class="od-badge <%= si.cls %>"><%= si.label %></span>
+    </div>
+  </div>
+
+  <% if (order.OrderStatus !== 'cancelled') { %>
+    <div class="od-tracker">
+      <% 
+        const trackerSteps = [
+          {key:'pending', label:'Đặt hàng', icon:'fa-shopping-bag'},
+          {key:'confirmed', label:'Đã xác nhận', icon:'fa-check-circle'},
+          {key:'shipping', label:'Đang giao', icon:'fa-truck-fast'},
+          {key:'delivered', label:'Đã nhận', icon:'fa-box-open'}
+        ]; 
+        let fillWidth = "0%";
+        if (currentStep === 1) fillWidth = "33%";
+        if (currentStep === 2) fillWidth = "66%";
+        if (currentStep === 3) fillWidth = "100%";
+      %>
+      <div class="od-tracker-fill" style="width: <%= fillWidth %>;"></div>
+      
+      <% trackerSteps.forEach((step, i) => { %>
+        <div class="od-step <%= currentStep >= i ? 'active' : '' %>">
+          <div class="od-step-icon"><i class="fas <%= step.icon %>"></i></div>
+          <div class="od-step-label"><%= step.label %></div>
+        </div>
+      <% }); %>
+    </div>
+  <% } else { %>
+    <div class="od-tracker" style="justify-content: center; padding: 20px;">
+      <div style="color:#e74c3c; font-weight:600; font-size:1.1rem;"><i class="fas fa-times-circle"></i> Đơn hàng này đã bị hủy.</div>
+    </div>
+  <% } %>
+
+  <div class="od-grid">
+    <!-- Shipping Address -->
+    <div class="od-card">
+      <h3><i class="fas fa-map-marked-alt"></i> Địa chỉ giao hàng</h3>
+      <p><strong><%= order.FullName %></strong></p>
+      <p><i class="fas fa-phone-alt" style="color:#999; margin-right:6px;"></i> <%= order.Phone %></p>
+      <p><i class="fas fa-location-dot" style="color:#999; margin-right:6px;"></i> <%= order.Street %><%= order.District ? ', ' + order.District : '' %>, <%= order.City %></p>
+      <% if (order.Note) { %>
+        <div style="margin-top:12px; padding:10px; background:#f9f9f9; border-left:3px solid #d4a574; border-radius:4px; font-size:0.85rem;">
+          <strong style="color:#555;">Ghi chú:</strong> <%= order.Note %>
+        </div>
+      <% } %>
+    </div>
+
+    <!-- Payment Summary -->
+    <div class="od-card">
+      <h3><i class="fas fa-wallet"></i> Thông tin thanh toán</h3>
+      <p style="margin-bottom:16px;"><strong>Phương thức:</strong> <%= pmMap[order.PaymentMethod] || order.PaymentMethod %></p>
+      
+      <div class="od-summary-row">
+        <span>Tạm tính</span>
+        <span class="val"><%= formatPrice(order.totalPrice - order.shippingFee) %></span>
+      </div>
+      <div class="od-summary-row">
+        <span>Phí vận chuyển</span>
+        <span class="val"><%= order.shippingFee === 0 ? '✓ Miễn phí' : formatPrice(order.shippingFee) %></span>
+      </div>
+      
+      <div class="od-summary-divider"></div>
+      
+      <div class="od-total-row">
+        <span>Tổng cộng</span>
+        <span class="val"><%= formatPrice(order.totalPrice) %></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Items -->
+  <div class="od-items">
+    <h3 style="font-size:1.1rem; color:#333; margin-bottom:16px; display:flex; align-items:center; gap:8px;">
+      <i class="fas fa-box" style="color:#d4a574;"></i> Sản phẩm (<%= order.items.length %>)
+    </h3>
+    <% order.items.forEach(item => { %>
+      <div class="oi-row">
+        <img src="<%= item.Image || '/images/product-default.jpg' %>" alt="<%= item.Name %>" class="oi-img">
+        <div class="oi-info">
+          <div class="oi-name"><%= item.Name %></div>
+          <div class="oi-variants">
+            <% if(item.Color || item.Size) { %>
+              <%= item.Color || '' %><%= (item.Color && item.Size) ? ' / ' : '' %><%= item.Size || '' %>
+            <% } %>
+            &nbsp;|&nbsp; Số lượng: <%= item.Quantity %>
+          </div>
+        </div>
+        <div class="oi-price"><%= formatPrice(item.price * item.Quantity) %></div>
+      </div>
+    <% }); %>
+  </div>
+
+  <div class="od-actions">
+    <a href="/orders" class="btn-back"><i class="fas fa-arrow-left"></i> Trở về Danh sách</a>
+    <% if (order.OrderStatus === 'pending') { %>
+      <form action="/orders/<%= order.Id %>/cancel" method="POST" onsubmit="return confirm('Bạn có chắc chắn muốn hủy đơn hàng này không? Hành động này không thể hoàn tác.')" style="display:inline;">
+        <button type="submit" class="btn-cancel"><i class="fas fa-times"></i> Hủy đơn hàng</button>
+      </form>
+    <% } %>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>
+<button class="scroll-top" id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="fas fa-arrow-up"></i></button>
+<script src="/js/main.js"></script>
+</body>
+</html>

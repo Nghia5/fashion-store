@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Đăng ký | Fashion Store</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="/css/auth.css">
+</head>
+<body class="auth-page">
+
+<% if (typeof success !== 'undefined' && success && success.length) { %><div style="position:fixed;top:20px;right:20px;background:#4caf50;color:#fff;padding:12px 20px;border-radius:6px;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,0.15);font-size:0.88rem"><i class="fas fa-check-circle"></i> <%= success[0] %></div><% } %>
+<% if (typeof error !== 'undefined' && error && error.length) { %><div style="position:fixed;top:20px;right:20px;background:#e74c3c;color:#fff;padding:12px 20px;border-radius:6px;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,0.15);font-size:0.88rem"><i class="fas fa-exclamation-circle"></i> <%= error[0] %></div><% } %>
+
+<!-- Top Bar -->
+<div class="auth-topbar">
+  <div class="auth-topbar-inner">
+    <div class="auth-topbar-left">
+      <a href="/" class="auth-topbar-logo">✦ FASHION<span>STORE</span></a>
+      <span class="auth-topbar-title">Đăng Ký</span>
+    </div>
+    <a href="/" class="auth-topbar-help">Bạn cần giúp đỡ?</a>
+  </div>
+</div>
+
+<!-- Main -->
+<div class="auth-main">
+  <div class="auth-bg-image" style="background-image:url('https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=1600&auto=format&fit=crop')"></div>
+  <div class="auth-bg-overlay"></div>
+
+  <!-- Promo Side -->
+  <div class="auth-promo">
+    <div class="auth-promo-logo"><i class="fas fa-star"></i> FASHION STORE</div>
+    <h2>TRỞ THÀNH<br><em>THÀNH VIÊN</em><br>HÔM NAY</h2>
+    <p>Đăng ký để nhận ngay ưu đãi đặc biệt dành cho thành viên mới</p>
+    <div class="auth-promo-tags">
+      <span class="auth-promo-tag">🎉 GIẢM 20% ĐƠN ĐẦU</span>
+      <span class="auth-promo-tag">✨ FREESHIP MỎI ĐƠN</span>
+      <span class="auth-promo-tag">💎 TÍCH ĐIỂM THƯỞNG</span>
+    </div>
+  </div>
+
+  <!-- Register Form -->
+  <div class="auth-card-wrap">
+    <div class="auth-form-card">
+      <h1>Đăng Ký</h1>
+
+      <form action="/auth/register" method="POST">
+        <div class="auth-field">
+          <div class="auth-input-icon">
+            <i class="fas fa-user"></i>
+            <input type="text" name="name" class="auth-input" placeholder="Họ và tên" required autofocus>
+          </div>
+        </div>
+
+        <div class="auth-field">
+          <div class="auth-input-icon">
+            <i class="fas fa-envelope"></i>
+            <input type="email" name="email" class="auth-input" placeholder="Email của bạn" required>
+          </div>
+        </div>
+
+        <div class="auth-field">
+          <div class="auth-input-icon">
+            <i class="fas fa-phone"></i>
+            <input type="tel" name="phone" class="auth-input" placeholder="Số điện thoại">
+          </div>
+        </div>
+
+        <div class="auth-field">
+          <div class="auth-input-icon">
+            <i class="fas fa-lock"></i>
+            <input type="password" name="password" class="auth-input" placeholder="Mật khẩu (tối thiểu 6 ký tự)" required minlength="6">
+          </div>
+        </div>
+
+        <button type="submit" class="auth-submit">ĐĂNG KÝ</button>
+      </form>
+
+      <div class="auth-divider">HOẶC</div>
+
+      <div class="auth-social">
+        <button class="auth-social-btn fb"><i class="fab fa-facebook"></i> Facebook</button>
+        <button class="auth-social-btn gg"><i class="fab fa-google"></i> Google</button>
+      </div>
+
+      <div class="auth-terms">
+        Bằng việc đăng ký, bạn đã đồng ý với
+        <a href="#">Điều khoản dịch vụ</a> &
+        <a href="#">Chính sách bảo mật</a>
+      </div>
+
+      <div class="auth-switch">
+        Đã có tài khoản? <a href="/auth/login">Đăng nhập</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Footer -->
+<div class="auth-footer">
+  &copy; 2024 Fashion Store. Tất cả quyền được bảo lưu.
+</div>
+
+<script>setTimeout(() => { document.querySelectorAll('[style*="fixed"]').forEach(el => el.remove()); }, 4000);</script>
+</body>
+</html>

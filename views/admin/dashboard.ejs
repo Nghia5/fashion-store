@@ -1,0 +1,100 @@
+<% const formatPrice = (price) => price ? price.toLocaleString('vi-VN') + 'đ' : '0đ'; %>
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tổng quan | Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="admin-body">
+<%- include('../partials/admin-sidebar') %>
+<div class="admin-main">
+  <div class="admin-topbar">
+    <button class="sidebar-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+    <h2>Tổng quan</h2>
+    <div class="topbar-right">
+      <span class="admin-user"><i class="fas fa-user-circle"></i> <%= user?.Name || 'Admin' %></span>
+    </div>
+  </div>
+  <div class="admin-content">
+    <div class="stats-grid">
+      <div class="stat-card stat-revenue">
+        <div class="stat-card-icon"><i class="fas fa-money-bill-wave"></i></div>
+        <div class="stat-card-info">
+          <div class="stat-card-label">Doanh thu</div>
+          <div class="stat-card-value"><%= formatPrice(totalRevenue) %></div>
+        </div>
+      </div>
+      <div class="stat-card stat-orders">
+        <div class="stat-card-icon"><i class="fas fa-shopping-cart"></i></div>
+        <div class="stat-card-info">
+          <div class="stat-card-label">Đơn hàng</div>
+          <div class="stat-card-value"><%= totalOrders %></div>
+        </div>
+      </div>
+      <div class="stat-card stat-products">
+        <div class="stat-card-icon"><i class="fas fa-box"></i></div>
+        <div class="stat-card-info">
+          <div class="stat-card-label">Sản phẩm</div>
+          <div class="stat-card-value"><%= totalProducts %></div>
+        </div>
+      </div>
+      <div class="stat-card stat-users">
+        <div class="stat-card-icon"><i class="fas fa-users"></i></div>
+        <div class="stat-card-info">
+          <div class="stat-card-label">Khách hàng</div>
+          <div class="stat-card-value"><%= totalUsers %></div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="admin-two-col">
+      <div class="admin-card">
+        <div class="admin-card-header">
+          <h3>Đơn hàng gần đây</h3>
+          <a href="/admin/orders" class="btn btn-outline btn-sm">Xem tất cả</a>
+        </div>
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead><tr><th>Mã Đơn</th><th>Khách hàng</th><th>Tổng tiền</th><th>Trạng thái</th></tr></thead>
+            <tbody>
+              <% recentOrders.forEach(o => { %>
+                <tr>
+                  <td>#<%= o.OrderNumber %></td>
+                  <td><%= o.FullName %></td>
+                  <td><%= formatPrice(o.TotalPrice) %></td>
+                  <td><span class="status-badge status-<%= o.OrderStatus %>"><%= o.OrderStatus %></span></td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      
+      <div class="admin-card">
+        <div class="admin-card-header">
+          <h3>Sản phẩm bán chạy</h3>
+        </div>
+        <div class="top-products-list">
+          <% topProducts.forEach((p, i) => { %>
+            <div class="top-product-item">
+              <div class="top-rank"><%= i+1 %></div>
+              <img src="<%= p.images && p.images[0] ? p.images[0] : '/images/product-default.jpg' %>" alt="<%= p.Name %>" class="top-prod-img">
+              <div class="top-prod-info">
+                <p><%= p.Name %></p>
+                <small>Đã bán: <%= p.Sold %></small>
+              </div>
+              <span class="top-prod-price"><%= formatPrice(p.SalePrice || p.Price) %></span>
+            </div>
+          <% }) %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="/js/main.js"></script>
+</body>
+</html>

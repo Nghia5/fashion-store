@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hồ sơ của tôi | Fashion Store</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<% if (success && success.length) { %><div class="flash flash-success"><i class="fas fa-check-circle"></i> <%= success[0] %><button class="flash-close" onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button></div><% } %>
+<% if (error && error.length) { %><div class="flash flash-error"><i class="fas fa-exclamation-circle"></i> <%= error[0] %><button class="flash-close" onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button></div><% } %>
+<%- include('./partials/navbar') %>
+
+<div class="page-header">
+  <div class="container">
+    <h1>Hồ Sơ Của Tôi</h1>
+  </div>
+</div>
+
+<div class="container profile-layout">
+  <!-- Sidebar -->
+  <div class="profile-sidebar">
+    <div class="profile-avatar-section">
+      <div class="profile-avatar-wrap">
+        <img src="<%= profileUser.avatar || '/images/default-avatar.png' %>" alt="Avatar" class="profile-avatar" id="avatarImg">
+      </div>
+      <h3><%= profileUser.name %></h3>
+      <p class="text-gray"><%= profileUser.email %></p>
+      <span class="role-badge"><%= profileUser.role === 'admin' ? '👑 Admin' : '👤 Thành viên' %></span>
+    </div>
+    <nav class="profile-nav">
+      <a href="/auth/profile" class="profile-nav-link active"><i class="fas fa-user"></i> Thông tin cá nhân</a>
+      <a href="/orders" class="profile-nav-link"><i class="fas fa-shopping-bag"></i> Đơn hàng</a>
+      <a href="/wishlist" class="profile-nav-link"><i class="fas fa-heart"></i> Yêu thích</a>
+      <a href="/auth/logout" class="profile-nav-link logout"><i class="fas fa-sign-out-alt"></i> Đăng xuất</a>
+    </nav>
+  </div>
+
+  <!-- Profile Form -->
+  <div class="profile-content">
+    <div class="profile-card">
+      <h2>Thông tin cá nhân</h2>
+      <form action="/auth/profile" method="POST" class="profile-form">
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">Họ và tên</label>
+            <input type="text" name="name" class="form-input" value="<%= profileUser.name %>" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email</label>
+            <input type="email" class="form-input" value="<%= profileUser.email %>" disabled>
+            <small class="form-hint">Email không thể thay đổi</small>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Số điện thoại</label>
+            <input type="tel" name="phone" class="form-input" value="<%= profileUser.phone || '' %>" placeholder="0901 234 567">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Thành viên từ</label>
+            <input type="text" class="form-input" value="<%= new Date(profileUser.createdAt).toLocaleDateString('vi-VN') %>" disabled>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary">
+          <i class="fas fa-save"></i> Lưu thay đổi
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<%- include('./partials/footer') %>
+<script src="/js/main.js"></script>
+</body>
+</html>
