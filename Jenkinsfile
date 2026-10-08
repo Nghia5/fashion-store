@@ -32,11 +32,10 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                // Sử dụng npx pm2 để tránh lỗi không nhận diện được lệnh pm2 trong môi trường Jenkins
-                bat 'npx pm2 restart fashion-store || npx pm2 start server.js --name "fashion-store"'
-                
-                // Nếu Jenkins chạy trên Linux:
-                // sh 'npx pm2 restart fashion-store || npx pm2 start server.js --name "fashion-store"'
+                // Sửa lỗi Jenkins Local System không có thư mục npm global
+                // Bằng cách cài pm2 cục bộ và gọi trực tiếp file thực thi
+                bat 'npm install pm2 --no-save'
+                bat '.\\node_modules\\.bin\\pm2 restart fashion-store || .\\node_modules\\.bin\\pm2 start server.js --name "fashion-store"'
             }
         }
     }
