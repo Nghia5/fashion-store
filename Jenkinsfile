@@ -32,12 +32,11 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                // Lệnh khởi động lại server.
-                // Thường sử dụng PM2 để quản lý process Node.js:
-                bat 'pm2 restart fashion-store || pm2 start server.js --name "fashion-store"'
+                // Sử dụng npx pm2 để tránh lỗi không nhận diện được lệnh pm2 trong môi trường Jenkins
+                bat 'npx pm2 restart fashion-store || npx pm2 start server.js --name "fashion-store"'
                 
                 // Nếu Jenkins chạy trên Linux:
-                // sh 'pm2 restart fashion-store || pm2 start server.js --name "fashion-store"'
+                // sh 'npx pm2 restart fashion-store || npx pm2 start server.js --name "fashion-store"'
             }
         }
     }
