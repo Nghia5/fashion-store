@@ -32,10 +32,10 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                // Sửa lỗi Jenkins Local System không có thư mục npm global
-                // Bằng cách cài pm2 cục bộ và gọi trực tiếp file thực thi
+                // Sửa lỗi đường dẫn file sau khi chia thư mục
+                // Xóa process cũ nếu có và chạy lại từ đầu bằng đường dẫn mới
                 bat 'npm install pm2 --no-save'
-                bat '.\\node_modules\\.bin\\pm2 restart fashion-store || .\\node_modules\\.bin\\pm2 start backend/server.js --name "fashion-store"'
+                bat '(.\\node_modules\\.bin\\pm2 delete fashion-store || exit 0) && .\\node_modules\\.bin\\pm2 start backend/server.js --name "fashion-store"'
             }
         }
     }
