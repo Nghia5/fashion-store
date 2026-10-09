@@ -1,4 +1,4 @@
-﻿require("dotenv").config();
+require("dotenv").config();
 const express = require("express");
 const session = require("express-session");
 const flash = require("connect-flash");
@@ -12,8 +12,8 @@ process.on("unhandledRejection", (err) => console.error("Unhandled:", err && err
 process.on("uncaughtException", (err) => console.error("Uncaught:", err && err.message));
 
 app.set("view engine", "ejs");
-app.set("views", path.join(__dirname, "views"));
-app.use(express.static(path.join(__dirname, "public")));
+app.set("views", path.join(__dirname, "../frontend/views"));
+app.use(express.static(path.join(__dirname, "../frontend/public")));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride("_method"));

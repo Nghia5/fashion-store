@@ -35,7 +35,7 @@ pipeline {
                 // Sửa lỗi Jenkins Local System không có thư mục npm global
                 // Bằng cách cài pm2 cục bộ và gọi trực tiếp file thực thi
                 bat 'npm install pm2 --no-save'
-                bat '.\\node_modules\\.bin\\pm2 restart fashion-store || .\\node_modules\\.bin\\pm2 start server.js --name "fashion-store"'
+                bat '.\\node_modules\\.bin\\pm2 restart fashion-store || .\\node_modules\\.bin\\pm2 start backend/server.js --name "fashion-store"'
             }
         }
     }
