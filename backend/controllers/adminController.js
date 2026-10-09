@@ -77,16 +77,24 @@ exports.createProduct = async (req, res) => {
 exports.updateProduct = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, description, categoryId, gender, brand, price, salePrice, tags, isFeatured, isNewArrival } = req.body;
+    const { name, description, categoryId, gender, brand, price, salePrice, tags, isFeatured, isNewArrival, isActive } = req.body;
     let images = [];
     if (req.files && req.files.length > 0) images = req.files.map(f => "/uploads/" + f.filename);
     else if (req.body.imageUrls) images = req.body.imageUrls.split("\n").map(u=>u.trim()).filter(Boolean);
     else { const ex = await query("SELECT Images FROM Products WHERE Id=@id", { id }); images = (() => { try { return JSON.parse(ex.recordset[0]?.Images||"[]"); } catch { return []; } })(); }
     const slug = slugify(name, { lower: true, strict: true }) + "-" + id;
-    await query("UPDATE Products SET Name=@name,Slug=@slug,Description=@desc,CategoryId=@cid,Gender=@gender,Brand=@brand,Price=@price,SalePrice=@salePrice,Images=@images,Tags=@tags,IsFeatured=@feat,IsNewArrival=@newArr WHERE Id=@id",
-      { name,slug,desc:description||"",cid:categoryId||null,gender:gender||null,brand:brand||"",price:parseFloat(price)||0,salePrice:salePrice?parseFloat(salePrice):null,images:JSON.stringify(images),tags:tags||"",feat:isFeatured?1:0,newArr:isNewArrival?1:0,id });
-    req.flash("success", "Da cap nhat!"); res.redirect("/admin/products");
-  } catch (err) { console.error(err); req.flash("error", "Loi"); res.redirect("/admin/products"); }
+    const activeVal = isActive !== undefined ? (isActive ? 1 : 0) : 1;
+    await query("UPDATE Products SET Name=@name,Slug=@slug,Description=@desc,CategoryId=@cid,Gender=@gender,Brand=@brand,Price=@price,SalePrice=@salePrice,Images=@images,Tags=@tags,IsFeatured=@feat,IsNewArrival=@newArr,IsActive=@active WHERE Id=@id",
+      { name,slug,desc:description||"",cid:categoryId||null,gender:gender||null,brand:brand||"",price:parseFloat(price)||0,salePrice:salePrice?parseFloat(salePrice):null,images:JSON.stringify(images),tags:tags||"",feat:isFeatured?1:0,newArr:isNewArrival?1:0,active:activeVal,id });
+    req.flash("success", "Đã cập nhật sản phẩm thành công!"); res.redirect("/admin/products");
+  } catch (err) { console.error(err); req.flash("error", "Lỗi cập nhật sản phẩm"); res.redirect("/admin/products"); }
+};
+
+exports.toggleProduct = async (req, res) => {
+  try {
+    await query("UPDATE Products SET IsActive = 1 - IsActive WHERE Id=@id", { id: req.params.id });
+    res.json({ success: true });
+  } catch (err) { res.json({ success: false }); }
 };
 
 exports.deleteProduct = async (req, res) => {

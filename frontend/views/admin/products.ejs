@@ -14,11 +14,317 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Quản lý sản phẩm | Admin</title>
+  <title>Quản lý sản phẩm | Admin Fashion</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .prod-mgmt-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .prod-mgmt-header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.8rem;
+      color: #1e293b;
+      margin: 0;
+    }
+    .btn-add-prod {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 11px 22px;
+      background: linear-gradient(135deg, #d4a574, #c49565);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      text-decoration: none;
+      box-shadow: 0 4px 12px rgba(212,165,116,0.3);
+      transition: all 0.2s ease;
+    }
+    .btn-add-prod:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(212,165,116,0.4);
+      color: #fff;
+    }
+
+    /* Filter Toolbar */
+    .filter-toolbar {
+      background: #fff;
+      border-radius: 10px;
+      padding: 16px 20px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+      margin-bottom: 24px;
+    }
+    .filters-form-modern {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .search-input-wrap {
+      position: relative;
+      flex: 1;
+      min-width: 240px;
+    }
+    .search-input-wrap i {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #aaa;
+      font-size: 0.9rem;
+    }
+    .filter-input-modern {
+      width: 100%;
+      padding: 10px 14px 10px 38px;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 0.92rem;
+      font-family: 'Inter', sans-serif;
+      outline: none;
+      transition: all 0.2s;
+    }
+    .filter-input-modern:focus {
+      border-color: #d4a574;
+      box-shadow: 0 0 0 3px rgba(212,165,116,0.12);
+    }
+    .filter-select-modern {
+      padding: 10px 16px;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 0.92rem;
+      font-family: 'Inter', sans-serif;
+      background: #fff;
+      color: #475569;
+      outline: none;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .filter-select-modern:focus {
+      border-color: #d4a574;
+      box-shadow: 0 0 0 3px rgba(212,165,116,0.12);
+    }
+    .btn-filter-modern {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 20px;
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      color: #475569;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-filter-modern:hover {
+      background: #f1f5f9;
+      border-color: #94a3b8;
+      color: #1e293b;
+    }
+
+    /* Table & Card */
+    .admin-card-modern {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 14px rgba(0,0,0,0.05);
+      overflow: hidden;
+    }
+    .table-modern {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+    .table-modern th {
+      padding: 14px 18px;
+      background: #f8fafc;
+      color: #64748b;
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 2px solid #e2e8f0;
+      white-space: nowrap;
+    }
+    .table-modern td {
+      padding: 16px 18px;
+      border-bottom: 1px solid #f1f5f9;
+      vertical-align: middle;
+      font-size: 0.92rem;
+    }
+    .table-modern tbody tr:hover {
+      background: #fefcf9;
+    }
+
+    /* Thumbnail */
+    .prod-thumb-wrap {
+      width: 54px;
+      height: 54px;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid #e2e8f0;
+      background: #f8fafc;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .prod-thumb-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* Name & Badges */
+    .prod-name-title {
+      font-weight: 600;
+      color: #1e293b;
+      font-size: 0.95rem;
+      margin-bottom: 4px;
+      line-height: 1.4;
+    }
+    .badge-featured {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      background: #fffbeb;
+      color: #b45309;
+      border: 1px solid #fde68a;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .badge-new-tag {
+      display: inline-flex;
+      align-items: center;
+      background: #eff6ff;
+      color: #1d4ed8;
+      border: 1px solid #bfdbfe;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    /* Price & Discount */
+    .price-col-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .price-sale-line {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .price-sale-val {
+      font-weight: 700;
+      color: #d4a574;
+      font-size: 1rem;
+    }
+    .badge-discount-tag {
+      background: #fee2e2;
+      color: #dc2626;
+      border: 1px solid #fca5a5;
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .price-orig-striked {
+      font-size: 0.82rem;
+      color: #94a3b8;
+      text-decoration: line-through;
+    }
+    .price-regular-val {
+      font-weight: 600;
+      color: #334155;
+      font-size: 0.95rem;
+    }
+
+    /* Status Badge */
+    .status-toggle-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .status-badge-active {
+      background: #dcfce7;
+      color: #15803d;
+      border: 1px solid #bbf7d0;
+    }
+    .status-badge-active:hover {
+      background: #bbf7d0;
+    }
+    .status-badge-hidden {
+      background: #fee2e2;
+      color: #b91c1c;
+      border: 1px solid #fecaca;
+    }
+    .status-badge-hidden:hover {
+      background: #fecaca;
+    }
+
+    /* Action Buttons */
+    .action-icons-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-action-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      border: 1px solid #e2e8f0;
+      background: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    .btn-action-edit {
+      color: #0284c7;
+    }
+    .btn-action-edit:hover {
+      background: #f0f9ff;
+      border-color: #0284c7;
+    }
+    .btn-action-delete {
+      color: #ef4444;
+    }
+    .btn-action-delete:hover {
+      background: #fef2f2;
+      border-color: #ef4444;
+    }
+
+    @media (max-width: 900px) {
+      .filters-form-modern { flex-direction: column; align-items: stretch; }
+      .admin-table-wrap { overflow-x: auto; }
+    }
+  </style>
 </head>
 <body class="admin-body">
 <%- include('../partials/admin-sidebar') %>
@@ -26,79 +332,136 @@
 <div class="admin-main">
   <div class="admin-topbar">
     <button class="sidebar-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
-    <h2>Quản lý Sản phẩm</h2>
+    <div style="font-size: 1.1rem; font-weight: 600; color: #1e293b;">
+      <i class="fas fa-tshirt" style="color:#d4a574; margin-right:6px;"></i> Quản Lý Sản Phẩm
+    </div>
     <div class="topbar-right">
-      <a href="/admin/products/add" class="btn btn-primary"><i class="fas fa-plus"></i> Thêm sản phẩm</a>
+      <span class="admin-user"><i class="fas fa-user-circle"></i> <%= user?.Name || 'Admin Fashion' %></span>
     </div>
   </div>
 
-  <div class="admin-content">
-    <% if (typeof success !== 'undefined' && success && success.length) { %><div class="flash flash-success"><i class="fas fa-check-circle"></i> <%= success[0] %></div><% } %>
-    <% if (typeof error !== 'undefined' && error && error.length) { %><div class="flash flash-error"><i class="fas fa-exclamation-circle"></i> <%= error[0] %></div><% } %>
+  <div class="admin-content" style="padding: 24px;">
+    <% if (typeof success !== 'undefined' && success && success.length) { %>
+      <div class="flash flash-success"><i class="fas fa-check-circle"></i> <%= success[0] %></div>
+    <% } %>
+    <% if (typeof error !== 'undefined' && error && error.length) { %>
+      <div class="flash flash-error"><i class="fas fa-exclamation-circle"></i> <%= error[0] %></div>
+    <% } %>
 
-    <div class="admin-filters" style="margin-bottom: 2rem;">
-      <form action="/admin/products" method="GET" class="filters-form">
-        <input type="text" name="search" class="filter-input" placeholder="Tìm theo tên..." value="<%= filters.search||'' %>">
-        <select name="sort" class="filter-select">
+    <!-- Header Actions -->
+    <div class="prod-mgmt-header">
+      <div>
+        <h1>Danh Sách Sản Phẩm</h1>
+        <p style="color:#64748b; margin:4px 0 0; font-size:0.9rem;">Tổng số: <strong><%= total || products.length %></strong> sản phẩm</p>
+      </div>
+      <a href="/admin/products/new" class="btn-add-prod">
+        <i class="fas fa-plus"></i> Thêm sản phẩm mới
+      </a>
+    </div>
+
+    <!-- Filter Bar -->
+    <div class="filter-toolbar">
+      <form action="/admin/products" method="GET" class="filters-form-modern">
+        <div class="search-input-wrap">
+          <i class="fas fa-search"></i>
+          <input type="text" name="search" class="filter-input-modern" placeholder="Tìm kiếm theo tên sản phẩm..." value="<%= filters.search || '' %>">
+        </div>
+
+        <select name="sort" class="filter-select-modern">
           <option value="-createdAt" <%= filters.sort==='-createdAt'?'selected':'' %>>Mới nhất</option>
           <option value="price" <%= filters.sort==='price'?'selected':'' %>>Giá tăng dần</option>
           <option value="-price" <%= filters.sort==='-price'?'selected':'' %>>Giá giảm dần</option>
-          <option value="-sold" <%= filters.sort==='-sold'?'selected':'' %>>Bán chạy</option>
+          <option value="-sold" <%= filters.sort==='-sold'?'selected':'' %>>Bán chạy nhất</option>
         </select>
-        <button type="submit" class="btn btn-outline">Lọc</button>
+
+        <button type="submit" class="btn-filter-modern">
+          <i class="fas fa-filter"></i> Lọc
+        </button>
       </form>
     </div>
 
-    <div class="admin-card">
+    <!-- Products Table -->
+    <div class="admin-card-modern">
       <div class="admin-table-wrap">
-        <table class="admin-table">
+        <table class="table-modern">
           <thead>
             <tr>
-              <th>Hình ảnh</th>
+              <th style="width: 70px;">Hình ảnh</th>
               <th>Tên sản phẩm</th>
               <th>Danh mục</th>
               <th>Giới tính</th>
-              <th>Giá</th>
-              <th>Đã bán</th>
-              <th>Trạng thái</th>
-              <th>Hành động</th>
+              <th>Giá bán & Khuyến mãi</th>
+              <th style="text-align: center;">Đã bán</th>
+              <th style="text-align: center;">Trạng thái</th>
+              <th style="text-align: right; width: 100px;">Hành động</th>
             </tr>
           </thead>
           <tbody>
             <% products.forEach(product => { %>
             <tr id="prod-row-<%= product.Id %>">
               <td>
-                <img src="<%= getImg(product) %>" alt="<%= product.Name %>" class="admin-product-thumb">
-              </td>
-              <td>
-                <div style="max-width: 250px; white-space: normal;">
-                  <strong><%= product.Name %></strong>
-                  <% if (product.IsFeatured) { %><span class="badge badge-new" style="font-size:0.65rem; margin-left:8px;">Nổi bật</span><% } %>
+                <div class="prod-thumb-wrap">
+                  <img src="<%= getImg(product) %>" alt="<%= product.Name %>" class="prod-thumb-img" onerror="this.src='/images/product-default.jpg'">
                 </div>
               </td>
-              <td><%= product.CategoryName || 'N/A' %></td>
-              <td><%= product.Gender === 'male' ? 'Nam' : (product.Gender === 'female' ? 'Nữ' : 'Unisex') %></td>
               <td>
-                <% if (product.SalePrice) { %>
-                  <div class="text-gold" style="font-weight:600;"><%= formatPrice(product.SalePrice) %></div>
-                  <div class="text-gray" style="text-decoration:line-through; font-size:0.85rem;"><%= formatPrice(product.Price) %></div>
+                <div style="max-width: 280px;">
+                  <div class="prod-name-title"><%= product.Name %></div>
+                  <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:4px;">
+                    <% if (product.IsFeatured) { %>
+                      <span class="badge-featured"><i class="fas fa-star" style="font-size:0.65rem;"></i> Nổi bật</span>
+                    <% } %>
+                    <% if (product.IsNewArrival) { %>
+                      <span class="badge-new-tag"><i class="fas fa-sparkles" style="font-size:0.65rem;"></i> Mới</span>
+                    <% } %>
+                  </div>
+                </div>
+              </td>
+              <td style="color:#475569; font-weight:500;">
+                <%= product.CategoryName || 'Chưa phân loại' %>
+              </td>
+              <td>
+                <% if (product.Gender === 'male') { %>
+                  <span style="color:#0284c7; font-weight:500;"><i class="fas fa-mars"></i> Nam</span>
+                <% } else if (product.Gender === 'female') { %>
+                  <span style="color:#ec4899; font-weight:500;"><i class="fas fa-venus"></i> Nữ</span>
                 <% } else { %>
-                  <div style="font-weight:600;"><%= formatPrice(product.Price) %></div>
+                  <span style="color:#64748b; font-weight:500;">Unisex</span>
                 <% } %>
               </td>
-              <td><%= product.Sold %></td>
               <td>
-                <span class="status-badge <%= product.IsActive?'status-delivered':'status-cancelled' %>">
-                  <%= product.IsActive ? 'Đang bán' : 'Ẩn' %>
-                </span>
+                <div class="price-col-wrap">
+                  <% if (product.SalePrice && product.Price > product.SalePrice) { %>
+                    <% const discountPct = Math.round((1 - product.SalePrice / product.Price) * 100); %>
+                    <div class="price-sale-line">
+                      <span class="price-sale-val"><%= formatPrice(product.SalePrice) %></span>
+                      <span class="badge-discount-tag">-<%= discountPct %>%</span>
+                    </div>
+                    <span class="price-orig-striked"><%= formatPrice(product.Price) %></span>
+                  <% } else { %>
+                    <span class="price-regular-val"><%= formatPrice(product.Price) %></span>
+                  <% } %>
+                </div>
               </td>
-              <td>
-                <div class="actions-cell">
-                  <a href="/admin/products/<%= product.Id %>/edit" class="btn btn-outline btn-xs" title="Chỉnh sửa">
-                    <i class="fas fa-edit"></i>
+              <td style="text-align: center; font-weight:600; color:#475569;">
+                <%= product.Sold || 0 %>
+              </td>
+              <td style="text-align: center;">
+                <button class="status-toggle-btn <%= product.IsActive ? 'status-badge-active' : 'status-badge-hidden' %>"
+                        onclick="toggleProductStatus('<%= product.Id %>')"
+                        id="status-btn-<%= product.Id %>"
+                        title="Click để đổi trạng thái">
+                  <i class="fas fa-<%= product.IsActive ? 'check' : 'eye-slash' %>"></i>
+                  <span><%= product.IsActive ? 'Đang bán' : 'Tạm ẩn' %></span>
+                </button>
+              </td>
+              <td style="text-align: right;">
+                <div class="action-icons-wrap" style="justify-content: flex-end;">
+                  <a href="/admin/products/<%= product.Id %>/edit" class="btn-action-icon btn-action-edit" title="Chỉnh sửa sản phẩm">
+                    <i class="fas fa-pen"></i>
                   </a>
-                  <button class="btn btn-danger btn-xs" onclick="deleteProduct('<%= product.Id %>')" title="Xóa">
-                    <i class="fas fa-trash"></i>
+                  <button class="btn-action-icon btn-action-delete" onclick="deleteProduct('<%= product.Id %>')" title="Xóa sản phẩm">
+                    <i class="fas fa-trash-alt"></i>
                   </button>
                 </div>
               </td>
@@ -108,8 +471,8 @@
         </table>
       </div>
 
-      <% if (totalPages > 1) { %>
-      <div class="pagination" style="padding:1rem;">
+      <% if (typeof totalPages !== 'undefined' && totalPages > 1) { %>
+      <div class="pagination" style="padding:16px 20px; border-top:1px solid #f1f5f9;">
         <% for(let i=1; i<=totalPages; i++) { %>
         <a href="?search=<%= filters.search||'' %>&sort=<%= filters.sort||'' %>&page=<%= i %>"
            class="page-btn <%= i===currentPage?'active':'' %>"><%= i %></a>
@@ -121,28 +484,42 @@
 </div>
 
 <script>
+function toggleProductStatus(id) {
+  fetch('/admin/products/' + id + '/toggle', { method: 'PUT' })
+    .then(r => r.json())
+    .then(data => {
+      if (data.success) {
+        location.reload();
+      } else {
+        alert(data.message || 'Lỗi cập nhật trạng thái');
+      }
+    })
+    .catch(() => alert('Lỗi kết nối'));
+}
+
 function deleteProduct(id) {
-  if (!confirm('Ẩn sản phẩm này?')) return;
+  if (!confirm('Bạn có chắc chắn muốn xóa sản phẩm này?')) return;
   fetch('/admin/products/' + id, { method: 'DELETE' })
     .then(r => r.json())
     .then(data => {
       if (data.success) {
         const row = document.getElementById('prod-row-' + id);
-        if (row) row.remove();
-        showAdminToast('Đã ẩn sản phẩm', 'success');
+        if (row) {
+          row.style.transition = 'all 0.3s';
+          row.style.opacity = '0';
+          setTimeout(() => row.remove(), 300);
+        }
       } else {
-        showAdminToast(data.message || 'Lỗi', 'error');
+        alert(data.message || 'Lỗi khi xóa sản phẩm');
       }
-    });
+    })
+    .catch(() => alert('Lỗi kết nối'));
 }
-function showAdminToast(msg, type) {
-  const d = document.createElement('div');
-  d.className = 'flash flash-' + type;
-  d.textContent = msg;
-  document.body.appendChild(d);
-  setTimeout(() => d.remove(), 3000);
+
+function toggleSidebar() { 
+  document.getElementById('adminSidebar').classList.toggle('collapsed'); 
 }
-function toggleSidebar() { document.getElementById('adminSidebar').classList.toggle('collapsed'); }
 </script>
+<script src="/js/main.js"></script>
 </body>
 </html>

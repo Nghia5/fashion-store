@@ -10,9 +10,13 @@ router.get("/dashboard", adminController.getDashboard);
 
 router.get("/products", adminController.getProducts);
 router.get("/products/new", adminController.getProductForm);
+router.get("/products/add", adminController.getProductForm);
 router.post("/products", adminController.upload.array("images", 5), adminController.createProduct);
+router.post("/products/add", adminController.upload.array("images", 5), adminController.createProduct);
 router.get("/products/:id/edit", adminController.getProductForm);
 router.post("/products/:id", adminController.upload.array("images", 5), adminController.updateProduct);
+router.post("/products/:id/edit", adminController.upload.array("images", 5), adminController.updateProduct);
+router.put("/products/:id/toggle", adminController.toggleProduct);
 router.delete("/products/:id", adminController.deleteProduct);
 
 router.get("/orders", adminController.getOrders);
