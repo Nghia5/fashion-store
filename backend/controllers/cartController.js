@@ -1,4 +1,4 @@
-﻿const { query } = require("../config/db");
+const { query } = require("../config/db");
 
 const getOrCreateCart = async (userId) => {
   let r = await query("SELECT Id FROM Carts WHERE UserId=@uid", { uid: userId });
@@ -65,3 +65,58 @@ exports.removeFromCart = async (req, res) => {
     res.json({ success: true });
   } catch (err) { res.json({ success: false }); }
 };
+
+exports.applyCoupon = async (req, res) => {
+  try {
+    const { code, orderTotal = 0 } = req.body;
+    if (!code) return res.json({ success: false, message: "Vui lòng nhập mã giảm giá" });
+
+    const r = await query(
+      "SELECT * FROM Vouchers WHERE Code = @code AND IsActive = 1 AND StartDate <= GETDATE() AND EndDate >= GETDATE()",
+      { code: code.toUpperCase().trim() }
+    );
+    const voucher = r.recordset[0];
+    if (!voucher) {
+      return res.json({ success: false, message: "Mã giảm giá không hợp lệ hoặc đã hết hạn" });
+    }
+    if (voucher.UsageLimit > 0 && voucher.UsedCount >= voucher.UsageLimit) {
+      return res.json({ success: false, message: "Mã giảm giá đã hết lượt sử dụng" });
+    }
+    const total = parseFloat(orderTotal) || 0;
+    if (voucher.MinOrderValue && total < parseFloat(voucher.MinOrderValue)) {
+      return res.json({
+        success: false,
+        message: `Đơn hàng tối thiểu phải từ ${Number(voucher.MinOrderValue).toLocaleString('vi-VN')}đ để áp dụng mã này`
+      });
+    }
+
+    let discount = 0;
+    if (voucher.DiscountType === "percent") {
+      discount = Math.round(total * (parseFloat(voucher.DiscountValue) / 100));
+      if (voucher.MaxDiscount && discount > parseFloat(voucher.MaxDiscount)) {
+        discount = parseFloat(voucher.MaxDiscount);
+      }
+    } else {
+      discount = parseFloat(voucher.DiscountValue);
+    }
+    if (discount > total) discount = total;
+
+    res.json({
+      success: true,
+      voucher: {
+        code: voucher.Code,
+        description: voucher.Description,
+        discountType: voucher.DiscountType,
+        discountValue: voucher.DiscountValue,
+        discount
+      },
+      discount,
+      newTotal: total - discount,
+      message: `Áp dụng mã ${voucher.Code} thành công!`
+    });
+  } catch (err) {
+    console.error("APPLY COUPON ERROR:", err);
+    res.status(500).json({ success: false, message: "Lỗi khi áp dụng mã giảm giá" });
+  }
+};
+

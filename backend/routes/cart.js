@@ -10,5 +10,6 @@ router.get('/', isAuthenticated, cartController.getCart);
 router.post('/add', cartController.addToCart);
 router.post('/update', cartController.updateCart);
 router.post('/remove', cartController.removeFromCart);
+router.post('/apply-coupon', cartController.applyCoupon);
 
 module.exports = router;

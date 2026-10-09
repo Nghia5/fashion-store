@@ -1,4 +1,4 @@
-﻿const express = require("express");
+const express = require("express");
 const router = express.Router();
 const adminController = require("../controllers/adminController");
 const { isAdmin } = require("../middleware/auth");
@@ -24,5 +24,10 @@ router.put("/users/:id/toggle", adminController.toggleUser);
 router.get("/categories", adminController.getCategories);
 router.post("/categories", adminController.createCategory);
 router.delete("/categories/:id", adminController.deleteCategory);
+
+router.get("/vouchers", adminController.getVouchers);
+router.post("/vouchers", adminController.createVoucher);
+router.put("/vouchers/:id/toggle", adminController.toggleVoucher);
+router.delete("/vouchers/:id", adminController.deleteVoucher);
 
 module.exports = router;

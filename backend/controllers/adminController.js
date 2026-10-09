@@ -1,4 +1,4 @@
-﻿const { query } = require("../config/db");
+const { query } = require("../config/db");
 const slugify = require("slugify");
 const multer = require("multer");
 const path = require("path");
@@ -160,6 +160,61 @@ exports.deleteCategory = async (req, res) => {
   try { await query("UPDATE Categories SET IsActive=0 WHERE Id=@id", { id: req.params.id }); res.json({ success: true }); }
   catch (err) { res.json({ success: false }); }
 };
+
+// ============ VOUCHER ============
+
+exports.getVouchers = async (req, res) => {
+  try {
+    const r = await query("SELECT * FROM Vouchers ORDER BY CreatedAt DESC");
+    res.render("admin/vouchers", { title: "Quản lý Voucher", vouchers: r.recordset });
+  } catch (err) { console.error("ADMIN VOUCHER ERROR:", err); res.status(500).send("ERROR: " + err.message); }
+};
+
+exports.createVoucher = async (req, res) => {
+  try {
+    const { code, description, discountType, discountValue, minOrderValue, maxDiscount, usageLimit, startDate, endDate } = req.body;
+    await query(
+      `INSERT INTO Vouchers (Code, Description, DiscountType, DiscountValue, MinOrderValue, MaxDiscount, UsageLimit, StartDate, EndDate)
+       VALUES (@code, @desc, @type, @value, @min, @max, @limit, @start, @end)`,
+      {
+        code: code.toUpperCase().trim(),
+        desc: description || "",
+        type: discountType || "percent",
+        value: parseFloat(discountValue) || 0,
+        min: parseFloat(minOrderValue) || 0,
+        max: maxDiscount ? parseFloat(maxDiscount) : null,
+        limit: parseInt(usageLimit) || 100,
+        start: startDate || new Date(),
+        end: endDate
+      }
+    );
+    req.flash("success", "Đã tạo voucher thành công!");
+    res.redirect("/admin/vouchers");
+  } catch (err) {
+    console.error(err);
+    if (err.message && err.message.includes("UNIQUE")) {
+      req.flash("error", "Mã voucher đã tồn tại!");
+    } else {
+      req.flash("error", "Lỗi tạo voucher");
+    }
+    res.redirect("/admin/vouchers");
+  }
+};
+
+exports.toggleVoucher = async (req, res) => {
+  try {
+    await query("UPDATE Vouchers SET IsActive = 1 - IsActive WHERE Id=@id", { id: req.params.id });
+    res.json({ success: true });
+  } catch (err) { res.json({ success: false }); }
+};
+
+exports.deleteVoucher = async (req, res) => {
+  try {
+    await query("DELETE FROM Vouchers WHERE Id=@id", { id: req.params.id });
+    res.json({ success: true });
+  } catch (err) { res.json({ success: false }); }
+};
+
 
 
 
