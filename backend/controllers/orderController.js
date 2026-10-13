@@ -29,7 +29,7 @@ exports.postCheckout = async (req, res) => {
     const shippingFee = subtotal > 500000 ? 0 : 30000;
     const orderNumber = "FS" + Date.now().toString().slice(-8);
     const oR = await query(
-      "INSERT INTO Orders (UserId,OrderNumber,FullName,Phone,Street,District,City,PaymentMethod,TotalPrice,ShippingFee,Note) OUTPUT INSERTED.Id VALUES (@uid,@on,@fn,@ph,@st,@di,@ci,@pm,@tp,@sf,@note)",
+      "INSERT INTO Orders (UserId,OrderNumber,FullName,Phone,Street,District,City,PaymentMethod,TotalPrice,ShippingFee,Note) VALUES (@uid,@on,@fn,@ph,@st,@di,@ci,@pm,@tp,@sf,@note) RETURNING Id",
       { uid: req.session.userId, on: orderNumber, fn: fullName, ph: phone, st: street, di: district||"", ci: city, pm: paymentMethod, tp: subtotal+shippingFee, sf: shippingFee, note: note||"" }
     );
     const orderId = oR.recordset[0].Id;

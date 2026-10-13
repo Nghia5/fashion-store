@@ -1,0 +1,40 @@
+services:
+  database:
+    image: postgres:16-alpine
+    container_name: fashion_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: fashion
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: fashion
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U fashion -d fashion"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    # Không mở port 5432 ra ngoài, app kết nối qua mạng nội bộ của Docker
+
+  app:
+    image: node:20
+    container_name: fashion_app
+    restart: unless-stopped
+    working_dir: /app
+    volumes:
+      - .:/app
+    command: sh -c "npm install && node backend/server.js"
+    ports:
+      - "80:3000"
+    environment:
+      DB_HOST: database
+      DB_PORT: 5432
+      DB_USER: fashion
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: fashion
+    depends_on:
+      database:
+        condition: service_healthy
+
+volumes:
+  pgdata:
