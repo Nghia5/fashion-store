@@ -8,9 +8,9 @@ TRUNCATE TABLE Wishlist, Reviews, OrderItems, Orders, CartItems, Carts, ProductV
 -- user123 hash
 -- ============================================================
 INSERT INTO Users (Name, Email, PasswordHash, Role, Phone) VALUES
-('Admin Fashion', 'admin@fashionstore.vn', '$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewdBPj/o/GBwvCmS', 'admin', '0901000001'),
-('Nguyễn Thị Lan', 'lan@gmail.com', '$2a$12$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC0.SJMjXgFHVaArn7MS', 'user', '0901000002'),
-('Trần Văn Minh', 'minh@gmail.com', '$2a$12$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC0.SJMjXgFHVaArn7MS', 'user', '0901000003');
+('Admin Fashion', 'admin@fashionstore.vn', '$2a$10$aroCrfVte.f2UuhGhIQkq.glDwZPwi/fckXvTJYf6kmChe5cTSEN2', 'admin', '0901000001'),
+('Nguyễn Thị Lan', 'lan@gmail.com', '$2a$10$iLPIgZ.AdaM8aQSfUn6jz.mHgm5r5ZB00BRJMNWMP2XzGNz6Njcbu', 'user', '0901000002'),
+('Trần Văn Minh', 'minh@gmail.com', '$2a$10$iLPIgZ.AdaM8aQSfUn6jz.mHgm5r5ZB00BRJMNWMP2XzGNz6Njcbu', 'user', '0901000003');
 
 -- ============================================================
 -- CATEGORIES
